@@ -48,6 +48,11 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        return new ArrayList<>();
+        Collection<ChessMove> availableMoves = new ArrayList<>();
+
+        int row = myPosition.getRow();
+        int col = myPosition.getColumn();
+
+
     }
 }
