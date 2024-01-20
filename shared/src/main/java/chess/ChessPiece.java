@@ -52,7 +52,6 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-//        return new ArrayList<>();
         Collection<ChessMove> availableMoves = new ArrayList<>();
 
         int row = myPosition.getRow();
@@ -63,27 +62,59 @@ public class ChessPiece {
             case QUEEN -> System.out.println("queen");
             case BISHOP -> System.out.println("bishop");
             case KNIGHT -> System.out.println("knight");
-            case ROOK -> System.out.println("rook");
+            case ROOK -> availableMoves.addAll(rookMoves(board, row, col));
             case PAWN -> System.out.println("pawn");
             default -> {
             }
         }
         return availableMoves;
-//        availableMoves.addAll(function(position, row, column))??
     }
 
-//    make a for each loop?? and a while loop for sure for each of the moves. Make sure to increment each of the moves by i or j at the end of the while loop
-//    for (int[] direction: directions){
-//        int i = direction[0]
-//        int j = direction[1]
-//    }
-//    while (position?? >=1, row <=8, col <=8)
-    public Collection<ChessMove> rookMoves(ChessPosition myPosition, int row, int col){
+
+    public Collection<ChessMove> rookMoves(ChessBoard board, int row, int col){
 //        rook can move up, down, and sideways
 //        write code that takes in position and shows how it can move up, down, and sideways to reach end position
 //        need to remember other pieces
-        Collection<ChessMove> availableRookMoves = new ArrayList<>();
-
+        Collection<ChessMove> availableMoves = new ArrayList<>();
+        //    make a for each loop?? and a while loop for sure for each of the moves. Make sure to increment each of the moves by i or j at the end of the while loop
+//    for (int[] move: moves){
+//        int i = move[0]
+//        int j = move[1]
+//    }
+//    while (position?? >=1, row <=8, col <=8)
+//        store all possible moves
+        int[][] moves = {{1,0},{0,1},{-1,0},{0,-1}};
+        boolean check=true;
+        for (int[] move: moves) {
+            check = true;
+            int i = move[0];
+            int j = move[1];
+// create the move by adding column or row to the new row
+            int newRow = i + row;
+            int newCol = j + col;
+//            System.out.println(newCol);
+            while (newRow >= 1 && newRow <= 8 && newCol >= 1 && newCol <= 8 && check==true) {
+                ChessPosition newPosition = new ChessPosition(newRow, newCol);
+//                System.out.println(newPosition);
+                ChessPiece capturedPiece = board.getPiece(newPosition);
+//looking to see if there's a piece in the space already and which team it's on
+                if (capturedPiece == null){
+                    availableMoves.add(new ChessMove(new ChessPosition(row, col), newPosition, null));
+                } else if (capturedPiece.getTeamColor() != pieceColor) {
+                    availableMoves.add(new ChessMove(new ChessPosition(row, col), newPosition, null));
+                    check = false;
+                } else if (capturedPiece.getTeamColor() == pieceColor){
+                    check = false;
+                    continue;
+//                    we don't want to capture our own piece so don't add
+                }
+//                add move to position of newRow and newCol
+                newRow += i;
+                newCol += j;
+//                System.out.println(newPosition);
+            }
+        }
+        return availableMoves;
     }
     @Override
     public boolean equals(Object o) {
