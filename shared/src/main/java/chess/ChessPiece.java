@@ -60,7 +60,7 @@ public class ChessPiece {
         switch (getPieceType()) {
             case KING -> System.out.println("king");
             case QUEEN -> System.out.println("queen");
-            case BISHOP -> System.out.println("bishop");
+            case BISHOP -> availableMoves.addAll(bishopMoves(board, row, col));
             case KNIGHT -> System.out.println("knight");
             case ROOK -> availableMoves.addAll(rookMoves(board, row, col));
             case PAWN -> System.out.println("pawn");
@@ -72,38 +72,29 @@ public class ChessPiece {
 
 
     public Collection<ChessMove> rookMoves(ChessBoard board, int row, int col){
-//        rook can move up, down, and sideways
-//        write code that takes in position and shows how it can move up, down, and sideways to reach end position
-//        need to remember other pieces
         Collection<ChessMove> availableMoves = new ArrayList<>();
-        //    make a for each loop?? and a while loop for sure for each of the moves. Make sure to increment each of the moves by i or j at the end of the while loop
-//    for (int[] move: moves){
-//        int i = move[0]
-//        int j = move[1]
-//    }
-//    while (position?? >=1, row <=8, col <=8)
 //        store all possible moves
         int[][] moves = {{1,0},{0,1},{-1,0},{0,-1}};
         boolean check=true;
         for (int[] move: moves) {
-            check = true;
+            check = true;//gives another parameter to while loop and prevents infinite loop
             int i = move[0];
             int j = move[1];
 // create the move by adding column or row to the new row
             int newRow = i + row;
             int newCol = j + col;
 //            System.out.println(newCol);
-            while (newRow >= 1 && newRow <= 8 && newCol >= 1 && newCol <= 8 && check==true) {
+            while (newRow >= 1 && newRow <= 8 && newCol >= 1 && newCol <= 8 && check) {
                 ChessPosition newPosition = new ChessPosition(newRow, newCol);
 //                System.out.println(newPosition);
-                ChessPiece capturedPiece = board.getPiece(newPosition);
+                ChessPiece captured = board.getPiece(newPosition);
 //looking to see if there's a piece in the space already and which team it's on
-                if (capturedPiece == null){
+                if (captured == null){
                     availableMoves.add(new ChessMove(new ChessPosition(row, col), newPosition, null));
-                } else if (capturedPiece.getTeamColor() != pieceColor) {
+                } else if (captured.getTeamColor() != pieceColor) {
                     availableMoves.add(new ChessMove(new ChessPosition(row, col), newPosition, null));
-                    check = false;
-                } else if (capturedPiece.getTeamColor() == pieceColor){
+                    check = false;//added to prevent infinite loop
+                } else if (captured.getTeamColor() == pieceColor){
                     check = false;
                     continue;
 //                    we don't want to capture our own piece so don't add
@@ -116,6 +107,40 @@ public class ChessPiece {
         }
         return availableMoves;
     }
+
+    public Collection<ChessMove> bishopMoves(ChessBoard board, int row, int col){
+//        should be super similar to rook moves I think??
+        Collection<ChessMove> availableMoves = new ArrayList<>();
+        int[][] moves = {{1,1}, {1,-1}, {-1,1}, {-1,-1}}; //similar to rook but goes diagonal
+        boolean check = true;
+        for (int[] move: moves){
+            check = true;
+            int i = move[0];
+            int j = move[1];
+
+            int newRow = i + row;
+            int newCol = j + col;
+
+            while (newRow >= 1 && newRow <= 8 && newCol >= 1 && newCol <= 8 && check) {
+                ChessPosition newPosition = new ChessPosition(newRow, newCol);
+                ChessPiece captured = board.getPiece(newPosition);
+                if (captured == null){
+                    availableMoves.add(new ChessMove(new ChessPosition(row, col), newPosition, null));
+                } else if (captured.getTeamColor() != pieceColor) {
+                    availableMoves.add(new ChessMove(new ChessPosition(row, col), newPosition, null));
+                    check = false;
+                } else if (captured.getTeamColor() == pieceColor){
+                    check = false;
+                    continue;
+                }
+                newRow += i;
+                newCol += j;
+            }
+        }
+        return availableMoves;
+//        i was right thank goodness
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
