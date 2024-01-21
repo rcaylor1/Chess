@@ -61,7 +61,7 @@ public class ChessPiece {
             case KING -> availableMoves.addAll(kingMoves(board, row, col));
             case QUEEN -> availableMoves.addAll(queenMoves(board, row, col));
             case BISHOP -> availableMoves.addAll(bishopMoves(board, row, col));
-            case KNIGHT -> System.out.println("knight");
+            case KNIGHT -> availableMoves.addAll(knightMoves(board, row, col));
             case ROOK -> availableMoves.addAll(rookMoves(board, row, col));
             case PAWN -> System.out.println("pawn");
             default -> {
@@ -138,7 +138,7 @@ public class ChessPiece {
             }
         }
         return availableBishopMoves;
-//        i was right thank goodness
+//        I was right thank goodness
     }
 
     public Collection<ChessMove> queenMoves(ChessBoard board, int row, int col){
@@ -203,6 +203,38 @@ public class ChessPiece {
         }
 
         return availableKingMoves;
+    }
+
+    public Collection<ChessMove> knightMoves(ChessBoard board, int row, int col){
+        Collection<ChessMove> availableKnightMoves = new ArrayList<>();
+//        moves in an L shape, so what would that look like??
+//        they can jump over pieces, so how can that be implemented??
+        int [][] moves = {{2,1}, {-2,1}, {-2,-1}, {2,-1}, {1,2}, {1,-2}, {-1,-2}, {-1,2}};
+        boolean check = true;
+        for (int [] move:moves){
+            check = true;
+            int i = move[0];
+            int j = move[1];
+
+            int newRow = i + row;
+            int newCol = j + col;
+
+            while (newRow >= 1 && newRow <= 8 && newCol >= 1 && newCol <= 8 && check) {
+                ChessPosition newPosition = new ChessPosition(newRow, newCol);
+                ChessPiece captured = board.getPiece(newPosition);
+                if (captured == null){
+                    availableKnightMoves.add(new ChessMove(new ChessPosition(row, col), newPosition, null));
+                } else if (captured.getTeamColor() != pieceColor) {
+                    availableKnightMoves.add(new ChessMove(new ChessPosition(row, col), newPosition, null));
+                    check = false;
+                } else if (captured.getTeamColor() == pieceColor){
+                    check = false;
+                    continue;
+                }
+                break;
+            }
+        }
+        return availableKnightMoves;
     }
 
     @Override
