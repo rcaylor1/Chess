@@ -59,7 +59,7 @@ public class ChessPiece {
 
         switch (getPieceType()) {
             case KING -> System.out.println("king");
-            case QUEEN -> System.out.println("queen");
+            case QUEEN -> availableMoves.addAll(queenMoves(board, row, col));
             case BISHOP -> availableMoves.addAll(bishopMoves(board, row, col));
             case KNIGHT -> System.out.println("knight");
             case ROOK -> availableMoves.addAll(rookMoves(board, row, col));
@@ -72,7 +72,7 @@ public class ChessPiece {
 
 
     public Collection<ChessMove> rookMoves(ChessBoard board, int row, int col){
-        Collection<ChessMove> availableMoves = new ArrayList<>();
+        Collection<ChessMove> availableRookMoves = new ArrayList<>();
 //        store all possible moves
         int[][] moves = {{1,0},{0,1},{-1,0},{0,-1}};
         boolean check=true;
@@ -90,9 +90,9 @@ public class ChessPiece {
                 ChessPiece captured = board.getPiece(newPosition);
 //looking to see if there's a piece in the space already and which team it's on
                 if (captured == null){
-                    availableMoves.add(new ChessMove(new ChessPosition(row, col), newPosition, null));
+                    availableRookMoves.add(new ChessMove(new ChessPosition(row, col), newPosition, null));
                 } else if (captured.getTeamColor() != pieceColor) {
-                    availableMoves.add(new ChessMove(new ChessPosition(row, col), newPosition, null));
+                    availableRookMoves.add(new ChessMove(new ChessPosition(row, col), newPosition, null));
                     check = false;//added to prevent infinite loop
                 } else if (captured.getTeamColor() == pieceColor){
                     check = false;
@@ -105,12 +105,12 @@ public class ChessPiece {
 //                System.out.println(newPosition);
             }
         }
-        return availableMoves;
+        return availableRookMoves;
     }
 
     public Collection<ChessMove> bishopMoves(ChessBoard board, int row, int col){
 //        should be super similar to rook moves I think??
-        Collection<ChessMove> availableMoves = new ArrayList<>();
+        Collection<ChessMove> availableBishopMoves = new ArrayList<>();
         int[][] moves = {{1,1}, {1,-1}, {-1,1}, {-1,-1}}; //similar to rook but goes diagonal
         boolean check = true;
         for (int[] move: moves){
@@ -125,9 +125,9 @@ public class ChessPiece {
                 ChessPosition newPosition = new ChessPosition(newRow, newCol);
                 ChessPiece captured = board.getPiece(newPosition);
                 if (captured == null){
-                    availableMoves.add(new ChessMove(new ChessPosition(row, col), newPosition, null));
+                    availableBishopMoves.add(new ChessMove(new ChessPosition(row, col), newPosition, null));
                 } else if (captured.getTeamColor() != pieceColor) {
-                    availableMoves.add(new ChessMove(new ChessPosition(row, col), newPosition, null));
+                    availableBishopMoves.add(new ChessMove(new ChessPosition(row, col), newPosition, null));
                     check = false;
                 } else if (captured.getTeamColor() == pieceColor){
                     check = false;
@@ -137,8 +137,40 @@ public class ChessPiece {
                 newCol += j;
             }
         }
-        return availableMoves;
+        return availableBishopMoves;
 //        i was right thank goodness
+    }
+
+    public Collection<ChessMove> queenMoves(ChessBoard board, int row, int col){
+        Collection<ChessMove> availableQueenMoves = new ArrayList<>();
+//        has all the same moves as rook and bishop slay
+        int[][] moves = {{1,1}, {1,-1}, {-1,1}, {-1,-1}, {0,1}, {1,0}, {-1,0}, {0,-1}};
+        boolean check = true;
+        for (int[] move: moves){
+            check = true;
+            int i = move[0];
+            int j = move[1];
+
+            int newRow = i + row;
+            int newCol = j + col;
+
+            while (newRow >= 1 && newRow <= 8 && newCol >= 1 && newCol <= 8 && check) {
+                ChessPosition newPosition = new ChessPosition(newRow, newCol);
+                ChessPiece captured = board.getPiece(newPosition);
+                if (captured == null){
+                    availableQueenMoves.add(new ChessMove(new ChessPosition(row, col), newPosition, null));
+                } else if (captured.getTeamColor() != pieceColor) {
+                    availableQueenMoves.add(new ChessMove(new ChessPosition(row, col), newPosition, null));
+                    check = false;
+                } else if (captured.getTeamColor() == pieceColor){
+                    check = false;
+                    continue;
+                }
+                newRow += i;
+                newCol += j;
+            }
+        }
+        return availableQueenMoves;
     }
 
     @Override
