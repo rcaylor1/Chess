@@ -58,7 +58,7 @@ public class ChessPiece {
         int col = myPosition.getColumn();
 
         switch (getPieceType()) {
-            case KING -> System.out.println("king");
+            case KING -> availableMoves.addAll(kingMoves(board, row, col));
             case QUEEN -> availableMoves.addAll(queenMoves(board, row, col));
             case BISHOP -> availableMoves.addAll(bishopMoves(board, row, col));
             case KNIGHT -> System.out.println("knight");
@@ -171,6 +171,38 @@ public class ChessPiece {
             }
         }
         return availableQueenMoves;
+    }
+
+    public Collection<ChessMove> kingMoves(ChessBoard board, int row, int col){
+        Collection<ChessMove> availableKingMoves = new ArrayList<>();
+//        can only move one square at a time so maybe not a while loop??
+        int [][] moves = {{1,0},{-1,0},{0,1},{0,-1},{1,1},{1,-1},{-1,1},{-1,-1}};
+        boolean check = true;
+        for (int [] move:moves){
+            check = true;
+            int i = move[0];
+            int j = move[1];
+
+            int newRow = i + row;
+            int newCol = j + col;
+
+            while (newRow >= 1 && newRow <= 8 && newCol >= 1 && newCol <= 8 && check) {
+                ChessPosition newPosition = new ChessPosition(newRow, newCol);
+                ChessPiece captured = board.getPiece(newPosition);
+                if (captured == null){
+                    availableKingMoves.add(new ChessMove(new ChessPosition(row, col), newPosition, null));
+                } else if (captured.getTeamColor() != pieceColor) {
+                    availableKingMoves.add(new ChessMove(new ChessPosition(row, col), newPosition, null));
+                    check = false;
+                } else if (captured.getTeamColor() == pieceColor){
+                    check = false;
+                    continue;
+                }
+                break; //don't want the while loop incrementing so break out of it once it runs once
+            }
+        }
+
+        return availableKingMoves;
     }
 
     @Override
