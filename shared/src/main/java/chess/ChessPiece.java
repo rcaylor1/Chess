@@ -63,7 +63,7 @@ public class ChessPiece {
             case BISHOP -> availableMoves.addAll(bishopMoves(board, row, col));
             case KNIGHT -> availableMoves.addAll(knightMoves(board, row, col));
             case ROOK -> availableMoves.addAll(rookMoves(board, row, col));
-            case PAWN -> System.out.println("pawn");
+            case PAWN -> availableMoves.addAll(pawnMoves(board, row, col));
             default -> {
             }
         }
@@ -235,6 +235,66 @@ public class ChessPiece {
             }
         }
         return availableKnightMoves;
+    }
+
+    public Collection<ChessMove> pawnMoves(ChessBoard board, int row, int col){
+        Collection<ChessMove> availablePawnMoves = new ArrayList<>();
+//        pawns can only move up 1, but up 2 on first turn. If statements maybe??
+//        They can capture diagonally
+//        color matters on this one I think, so do I want to put color as an argument?? Can I call color without doing this??
+
+        int [][] whiteInitial = {{1,0}};
+        int [][] blackInitial = {{-1,0}};
+        boolean check = true;
+        for (int[] move: whiteInitial) {
+            int i = move[0];
+            int j = move[1];
+
+            int newRow = i + row;
+            int newCol = j + col;
+
+            while (newRow >= 1 && newRow <= 4 && newCol >= 1 && newCol <= 8) {
+                ChessPosition newPosition = new ChessPosition(newRow, newCol);
+                ChessPiece blocked = board.getPiece(newPosition);
+                if (blocked != null){
+                    check = false;
+                    break;
+                } else {
+                    availablePawnMoves.add(new ChessMove(new ChessPosition(row, col), newPosition, null));
+                }
+                newRow += i;
+                newCol += j;
+            }
+        }
+
+        for (int[] move: blackInitial){
+            int i = move[0];
+            int j = move[1];
+
+            int newRow = i + row;
+            int newCol = j + col;
+            int blockedRow = i + row + 1;
+
+            while (newRow >= 5 && newRow <= 8 && newCol >= 1 && newCol <= 8) {
+                ChessPosition newPosition = new ChessPosition(newRow, newCol);
+                ChessPosition otherPosition = new ChessPosition(blockedRow, newCol);
+                ChessPiece blocked = board.getPiece(newPosition);
+                ChessPiece otherBlocked = board.getPiece(otherPosition);
+                if (blocked != null){
+                    check = false;
+                    break;
+                }
+                else {
+                    availablePawnMoves.add(new ChessMove(new ChessPosition(row, col), newPosition, null));
+                }
+                newRow += i;
+                newCol += j;
+            }
+        }
+
+//        int [][] moves = {{}}
+
+        return availablePawnMoves;
     }
 
     @Override
