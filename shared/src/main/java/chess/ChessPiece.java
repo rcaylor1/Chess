@@ -63,7 +63,7 @@ public class ChessPiece {
             case BISHOP -> availableMoves.addAll(bishopMoves(board, row, col));
             case KNIGHT -> availableMoves.addAll(knightMoves(board, row, col));
             case ROOK -> availableMoves.addAll(rookMoves(board, row, col));
-            case PAWN -> availableMoves.addAll(PawnMoves(board, row, col));
+            case PAWN -> availableMoves.addAll(pawnMoves(board, row, col));
             default -> {
             }
         }
@@ -236,7 +236,7 @@ public class ChessPiece {
         return availableKnightMoves;
     }
 
-    public Collection<ChessMove> PawnMoves(ChessBoard board, int row, int col){
+    public Collection<ChessMove> pawnMoves(ChessBoard board, int row, int col){
         Collection<ChessMove> availablePawnMoves = new ArrayList<>();
 //        pawns can only move up 1, but up 2 on first turn. If statements maybe?? Also, they can only capture diagonally
 //        color matters on this one because they move different directions
@@ -324,90 +324,6 @@ public class ChessPiece {
             }
         }
 
-        return availablePawnMoves;
-    }
-    public Collection<ChessMove> pawnMoves(ChessBoard board, int row, int col){
-        Collection<ChessMove> availablePawnMoves = new ArrayList<>();
-//        pawns can only move up 1, but up 2 on first turn. If statements maybe??
-//        They can capture diagonally
-//        color matters on this one I think, so do I want to put color as an argument?? Can I call color without doing this??
-
-        int [][] whiteInitial = {{1,0}};
-        int [][] blackInitial = {{-1,0}};
-        boolean check = true;
-        for (int[] move: whiteInitial) {
-            int i = move[0];
-            int j = move[1];
-
-            int newRow = i + row;
-            int newCol = j + col;
-
-            while (newRow >= 1 && newRow <= 4 && newCol >= 1 && newCol <= 8) {
-                ChessPosition newPosition = new ChessPosition(newRow, newCol);
-                ChessPiece blocked = board.getPiece(newPosition);
-                if (blocked != null){
-                    check = false;
-                    break;
-                } else {
-                    availablePawnMoves.add(new ChessMove(new ChessPosition(row, col), newPosition, null));
-                }
-                newRow += i;
-                newCol += j;
-            }
-        }
-
-        for (int[] move: blackInitial){
-            int i = move[0];
-            int j = move[1];
-
-            int newRow = i + row;
-            int newCol = j + col;
-
-            while (newRow >= 5 && newRow <= 8 && newCol >= 1 && newCol <= 8) {
-                ChessPosition newPosition = new ChessPosition(newRow, newCol);
-                ChessPiece blocked = board.getPiece(newPosition);
-                if (blocked != null){
-                    check = false;
-                    break;
-                }
-                else {
-                    availablePawnMoves.add(new ChessMove(new ChessPosition(row, col), newPosition, null));
-                }
-                newRow += i;
-                newCol += j;
-            }
-        }
-
-
-        return availablePawnMoves;
-    }
-
-    public Collection<ChessMove> otherPawnMoves(ChessBoard board, int row, int col){
-        Collection<ChessMove> availablePawnMoves = new ArrayList<>();
-        int[][] nextMoves = {{1,0}};
-        for (int[] move:nextMoves) {
-            int i = move[0];
-            int j = move[1];
-
-            int newRow = i + row;
-            int newCol = j + col;
-
-            while (newRow >= 4 && newRow <= 8 && newCol >= 1 && newCol <= 8) {
-                ChessPosition newPosition = new ChessPosition(newRow, newCol);
-                ChessPiece currentPiece = board.getPiece(newPosition);
-                ChessPiece blocked = board.getPiece(newPosition);
-                if (currentPiece.getTeamColor() == ChessGame.TeamColor.WHITE) {
-                    if (blocked != null) {
-                        break;
-                    } else {
-                        availablePawnMoves.add(new ChessMove(new ChessPosition(row, col), newPosition, null));
-                    }
-                } else {
-                    break;
-                }
-                break;
-            }
-        }
         return availablePawnMoves;
     }
 
