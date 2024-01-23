@@ -63,7 +63,7 @@ public class ChessPiece {
             case BISHOP -> availableMoves.addAll(bishopMoves(board, row, col));
             case KNIGHT -> availableMoves.addAll(knightMoves(board, row, col));
             case ROOK -> availableMoves.addAll(rookMoves(board, row, col));
-            case PAWN -> availableMoves.addAll(pawnMoves(board, row, col));
+            case PAWN -> availableMoves.addAll(PawnMoves(board, row, col));
             default -> {
             }
         }
@@ -102,7 +102,6 @@ public class ChessPiece {
 //                add move to position of newRow and newCol
                 newRow += i;
                 newCol += j;
-//                System.out.println(newPosition);
             }
         }
         return availableRookMoves;
@@ -237,6 +236,96 @@ public class ChessPiece {
         return availableKnightMoves;
     }
 
+    public Collection<ChessMove> PawnMoves(ChessBoard board, int row, int col){
+        Collection<ChessMove> availablePawnMoves = new ArrayList<>();
+//        pawns can only move up 1, but up 2 on first turn. If statements maybe?? Also, they can only capture diagonally
+//        color matters on this one because they move different directions
+//        I think instead of a 2D array, initialize an integer and change value based on black and white since the directions are different for the two colors
+        ChessPosition position = new ChessPosition(row, col);
+        ChessPiece newPiece = board.getPiece(position);
+        int direction = 0;
+        int initialDirection = 0;
+        if (newPiece.getTeamColor() == ChessGame.TeamColor.BLACK){
+            direction = -1;
+            initialDirection = -2;
+//            black pawn moves down
+        } else if (newPiece.getTeamColor() == ChessGame.TeamColor.WHITE){
+            direction = 1;
+            initialDirection = 2;
+//            white pawn moves up;
+        }
+//        ok so the pawn can only move two on the first turn, so make another int variable
+//        promotion piece will be null because we're not dealing with promotions right now
+//        white pawns start on row 2 and black pawns start on row 7
+        int initialNewRow = position.getRow()+initialDirection;
+        int initialBlockedRow = position.getRow()+initialDirection+1;
+        ChessPosition initialBlockedPosition = new ChessPosition(initialBlockedRow, col);
+        ChessPiece initialBlockedAgain = board.getPiece(initialBlockedPosition);
+        ChessPosition initialNewPosition = new ChessPosition(initialNewRow, col);
+        ChessPiece initialBlocked = board.getPiece(initialNewPosition);
+//        ChessMove initialMove = new ChessMove(position, new ChessPosition(newRow, newPosition.getColumn()),null);
+        if ((position.getRow()==7 && newPiece.getTeamColor()==ChessGame.TeamColor.BLACK) || position.getRow()==2&&newPiece.getTeamColor()==ChessGame.TeamColor.WHITE){
+            if (initialBlocked == null && initialBlockedAgain == null){
+                availablePawnMoves.add(new ChessMove(position, initialNewPosition, null));
+            }
+        }
+
+//        time to move forward one space; this is where things get complicated lol promotion starts to come into play
+        int newRow = position.getRow()+direction;
+        ChessPosition newPosition = new ChessPosition(newRow, col);
+        ChessPiece blocked = board.getPiece(newPosition);
+
+        if (blocked == null){
+            if ((newPosition.getRow() == 1 && newPiece.getTeamColor()==ChessGame.TeamColor.BLACK) || (newPosition.getRow() == 8 && newPiece.getTeamColor()==ChessGame.TeamColor.WHITE)){
+                availablePawnMoves.add(new ChessMove(position, newPosition, ChessPiece.PieceType.ROOK));
+                availablePawnMoves.add(new ChessMove(position, newPosition, ChessPiece.PieceType.QUEEN));
+                availablePawnMoves.add(new ChessMove(position, newPosition, ChessPiece.PieceType.KNIGHT));
+                availablePawnMoves.add(new ChessMove(position, newPosition, ChessPiece.PieceType.BISHOP));
+//                promote the pawns to any other piece except King
+            } else {
+                availablePawnMoves.add(new ChessMove(position, newPosition, null));
+//                this is returning the moves that aren't promoted
+            }
+        }
+//        ok so now do captures
+//        go to the left first
+        int leftCaptureColumn = position.getColumn() -1;
+        ChessPosition leftCapturePosition = new ChessPosition(newRow, leftCaptureColumn);
+        ChessPiece capture = board.getPiece(leftCapturePosition);
+
+        if (newRow >=1 && newRow <=8 && col >= 1 && col <= 8){
+            if (capture != null && capture.getTeamColor() != pieceColor){
+                if ((leftCapturePosition.getRow() == 1 && newPiece.getTeamColor()==ChessGame.TeamColor.BLACK) || (leftCapturePosition.getRow() == 8 && newPiece.getTeamColor()==ChessGame.TeamColor.WHITE)){
+                    availablePawnMoves.add(new ChessMove(position, leftCapturePosition, ChessPiece.PieceType.ROOK));
+                    availablePawnMoves.add(new ChessMove(position, leftCapturePosition, ChessPiece.PieceType.QUEEN));
+                    availablePawnMoves.add(new ChessMove(position, leftCapturePosition, ChessPiece.PieceType.KNIGHT));
+                    availablePawnMoves.add(new ChessMove(position, leftCapturePosition, ChessPiece.PieceType.BISHOP));
+                } else {
+                    availablePawnMoves.add(new ChessMove(position, leftCapturePosition, null));
+                }
+            }
+        }
+//        do same thing to the right
+
+        int rightCaptureColumn = position.getColumn()+1;
+        ChessPosition rightCapturePosition = new ChessPosition(newRow, rightCaptureColumn);
+        ChessPiece rightCapture = board.getPiece(rightCapturePosition);
+
+        if (newRow >=1 && newRow <=8 && col >= 1 && col <= 8){
+            if (rightCapture != null && rightCapture.getTeamColor() != pieceColor){
+                if ((rightCapturePosition.getRow() == 1 && newPiece.getTeamColor()==ChessGame.TeamColor.BLACK) || (rightCapturePosition.getRow() == 8 && newPiece.getTeamColor()==ChessGame.TeamColor.WHITE)){
+                    availablePawnMoves.add(new ChessMove(position, rightCapturePosition, ChessPiece.PieceType.ROOK));
+                    availablePawnMoves.add(new ChessMove(position, rightCapturePosition, ChessPiece.PieceType.QUEEN));
+                    availablePawnMoves.add(new ChessMove(position, rightCapturePosition, ChessPiece.PieceType.KNIGHT));
+                    availablePawnMoves.add(new ChessMove(position, rightCapturePosition, ChessPiece.PieceType.BISHOP));
+                } else {
+                    availablePawnMoves.add(new ChessMove(position, rightCapturePosition, null));
+                }
+            }
+        }
+
+        return availablePawnMoves;
+    }
     public Collection<ChessMove> pawnMoves(ChessBoard board, int row, int col){
         Collection<ChessMove> availablePawnMoves = new ArrayList<>();
 //        pawns can only move up 1, but up 2 on first turn. If statements maybe??
@@ -273,13 +362,10 @@ public class ChessPiece {
 
             int newRow = i + row;
             int newCol = j + col;
-            int blockedRow = i + row + 1;
 
             while (newRow >= 5 && newRow <= 8 && newCol >= 1 && newCol <= 8) {
                 ChessPosition newPosition = new ChessPosition(newRow, newCol);
-                ChessPosition otherPosition = new ChessPosition(blockedRow, newCol);
                 ChessPiece blocked = board.getPiece(newPosition);
-                ChessPiece otherBlocked = board.getPiece(otherPosition);
                 if (blocked != null){
                     check = false;
                     break;
@@ -292,8 +378,36 @@ public class ChessPiece {
             }
         }
 
-//        int [][] moves = {{}}
 
+        return availablePawnMoves;
+    }
+
+    public Collection<ChessMove> otherPawnMoves(ChessBoard board, int row, int col){
+        Collection<ChessMove> availablePawnMoves = new ArrayList<>();
+        int[][] nextMoves = {{1,0}};
+        for (int[] move:nextMoves) {
+            int i = move[0];
+            int j = move[1];
+
+            int newRow = i + row;
+            int newCol = j + col;
+
+            while (newRow >= 4 && newRow <= 8 && newCol >= 1 && newCol <= 8) {
+                ChessPosition newPosition = new ChessPosition(newRow, newCol);
+                ChessPiece currentPiece = board.getPiece(newPosition);
+                ChessPiece blocked = board.getPiece(newPosition);
+                if (currentPiece.getTeamColor() == ChessGame.TeamColor.WHITE) {
+                    if (blocked != null) {
+                        break;
+                    } else {
+                        availablePawnMoves.add(new ChessMove(new ChessPosition(row, col), newPosition, null));
+                    }
+                } else {
+                    break;
+                }
+                break;
+            }
+        }
         return availablePawnMoves;
     }
 
