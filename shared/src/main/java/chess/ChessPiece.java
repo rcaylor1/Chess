@@ -259,13 +259,16 @@ public class ChessPiece {
 //        white pawns start on row 2 and black pawns start on row 7
         int initialNewRow = position.getRow()+initialDirection;
         int initialBlockedRow = position.getRow()+initialDirection+1;
+        int initialBlockedRowWhite = position.getRow()+initialDirection-1;
+        ChessPosition blockedWhite = new ChessPosition(initialBlockedRowWhite, col);
+        ChessPiece whiteBlocked = board.getPiece(blockedWhite);
         ChessPosition initialBlockedPosition = new ChessPosition(initialBlockedRow, col);
         ChessPiece initialBlockedAgain = board.getPiece(initialBlockedPosition);
         ChessPosition initialNewPosition = new ChessPosition(initialNewRow, col);
         ChessPiece initialBlocked = board.getPiece(initialNewPosition);
 //        ChessMove initialMove = new ChessMove(position, new ChessPosition(newRow, newPosition.getColumn()),null);
         if ((position.getRow()==7 && newPiece.getTeamColor()==ChessGame.TeamColor.BLACK) || position.getRow()==2&&newPiece.getTeamColor()==ChessGame.TeamColor.WHITE){
-            if (initialBlocked == null && initialBlockedAgain == null){
+            if (initialBlocked == null && initialBlockedAgain == null && whiteBlocked == null){
                 availablePawnMoves.add(new ChessMove(position, initialNewPosition, null));
             }
         }
