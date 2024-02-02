@@ -3,6 +3,8 @@ package chess;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
+import java.util.Iterator;
+import java.util.HashSet;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -51,12 +53,27 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         Collection<ChessMove> availableMoves = new ArrayList<>();
-        ChessPiece piece = board.getPiece(startPosition);
+        ChessPiece piece = this.board.getPiece(startPosition);
+        Collection<ChessMove> pieceMoves = piece.pieceMoves(board, startPosition); //call pieceMoves from previous phase to access available moves
 //        instructions say if there is no piece at start position, return null
-        if (piece == null){
-            return null;
+        ChessBoard copyBoard;
+        for (ChessMove pieceMove : pieceMoves){
+            try{
+                makeMove(pieceMove);
+            }
+            catch (InvalidMoveException error){
+                System.out.println(error.getMessage());
+                continue;
+            }
+            availableMoves.add(pieceMove);
         }
-        
+//        if (piece == null){
+//            return null;
+//        }
+
+//        next step is to find valid moves
+//        I want to copy the board and see if I can make the move
+
         return availableMoves;
     }
 
@@ -152,5 +169,10 @@ public class ChessGame {
                 "currentTeam=" + currentTeam +
                 ", board=" + board +
                 '}';
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        return super.clone();
     }
 }

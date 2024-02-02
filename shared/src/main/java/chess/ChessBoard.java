@@ -83,6 +83,18 @@ public class ChessBoard {
         squares[7][6] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KNIGHT);
         squares[7][7] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK);
     }
+    public ChessBoard copy() {
+        ChessBoard copyBoard = new ChessBoard();
+        for (int i = 0; i < 8; i++){
+            for (int j = 0; j < 8; j++){
+                if (squares[i][j] != null){
+                    copyBoard.squares[i][j] = squares[i][j].copy();
+                }
+
+            }
+        }
+        return copyBoard;
+    }
 
     @Override
     public boolean equals(Object o) {
