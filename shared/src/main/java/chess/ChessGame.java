@@ -62,7 +62,7 @@ public class ChessGame {
         ChessBoard copyBoard;
         for (ChessMove pieceMove : pieceMoves){
             copyBoard = board.copy();
-
+            clonedMove(pieceMove, copyBoard); //makes the move on the copied board
             availableMoves.add(pieceMove);
         }
 //
@@ -71,6 +71,14 @@ public class ChessGame {
 //        I want to copy the board and see if I can make the move
 
         return availableMoves;
+    }
+
+    //make a method to simulate move on cloned board, so then you don't change the actual board
+    public void clonedMove(ChessMove move, ChessBoard board){
+//        need to get piece at the starting position of the move
+        ChessPiece piece = this.board.getPiece(move.getStartPosition());
+        board.addPiece(move.getEndPosition(), piece); //move piece to end position
+        board.addPiece(move.getStartPosition(), null); //clear out starting position
     }
 
     /**
