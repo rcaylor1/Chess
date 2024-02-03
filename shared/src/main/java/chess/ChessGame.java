@@ -52,24 +52,20 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        Collection<ChessMove> availableMoves = new ArrayList<>();
         ChessPiece piece = this.board.getPiece(startPosition);
+        if (piece == null){
+            return null; //this is if there is no piece at the start position
+        }
+        Collection<ChessMove> availableMoves = new ArrayList<>();
         Collection<ChessMove> pieceMoves = piece.pieceMoves(board, startPosition); //call pieceMoves from previous phase to access available moves
-//        instructions say if there is no piece at start position, return null
+
         ChessBoard copyBoard;
         for (ChessMove pieceMove : pieceMoves){
-            try{
-                makeMove(pieceMove);
-            }
-            catch (InvalidMoveException error){
-                System.out.println(error.getMessage());
-                continue;
-            }
+            copyBoard = board.copy();
+
             availableMoves.add(pieceMove);
         }
-//        if (piece == null){
-//            return null;
-//        }
+//
 
 //        next step is to find valid moves
 //        I want to copy the board and see if I can make the move
@@ -131,6 +127,21 @@ public class ChessGame {
             return true;
         }
     }
+
+//    make method for king position to make other methods easier
+    public ChessPosition kingPosition (TeamColor color, ChessBoard board){
+        for (int i = 0; i < 8; i++){
+            for (int j = 0; j < 8; j++){
+                ChessPosition kingPosition = new ChessPosition(i,j);
+                ChessPiece piece = board.getPiece(kingPosition);
+                if (piece.getPieceType() == ChessPiece.PieceType.KING && piece.getTeamColor() == color){
+                    return kingPosition;
+                }
+            }
+        }
+        return null;
+    }
+
 
     /**
      * Sets this game's chessboard with a given board

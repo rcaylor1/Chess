@@ -329,8 +329,8 @@ public class ChessPiece {
 
         return availablePawnMoves;
     }
-    public ChessPiece copy(){
-        return new ChessPiece(this.pieceColor, this.type);
+    public ChessPiece copyPiece(){
+        return new ChessPiece(this.pieceColor, this.type); //makes the copy of each piece
     }
 
     @Override
