@@ -88,8 +88,8 @@ public class ChessGame {
     public boolean clonedCheck(TeamColor color, ChessBoard board){
 //        first get the position of the king
         ChessPosition kingSpot = kingPosition(color, board);
-        for (int i = 0; i < 8; i++){
-            for (int j = 0; j < 8; j++){
+        for (int i = 1; i < 9; i++){
+            for (int j = 1; j < 9; j++){
                 ChessPosition newPosition = new ChessPosition(i,j);
                 ChessPiece newPiece = this.board.getPiece(newPosition);
                 if (newPiece != null && newPiece.getTeamColor() != color){
@@ -104,19 +104,6 @@ public class ChessGame {
         }
         return false;
     }
-
-//    make method to find and store moves the other team can make
-    public Collection<ChessMove> otherTeamMoves(TeamColor color, ChessBoard board){
-        Collection<ChessMove> moves = new ArrayList<>();
-        for (int i=1; i<9; i++){
-            for (int j=1; j<9; j++){
-                ChessPosition piecePosition = new ChessPosition(i,j);
-                ChessPiece otherTeamPiece = board.getPiece(piecePosition); //find piece at this new position
-
-            }
-        }
-        return moves;
-    }
     /**
      * Makes a move in a chess game
      *
@@ -129,7 +116,7 @@ public class ChessGame {
 //        A move is illegal if the chess piece cannot move there, if the move leaves the team’s king in danger, or if it’s not the corresponding team's turn.
 //        check if valid move first
         if (!validMoves(move.getStartPosition()).contains(move)){
-            throw new InvalidMoveException();
+            throw new InvalidMoveException("hey");
         }
         if (piece == null){
             throw new InvalidMoveException(); //can't move a piece if there isn't a piece there in the first place lol
@@ -159,8 +146,8 @@ public class ChessGame {
      */
     public boolean isInCheck(TeamColor teamColor) {
         ChessPosition kingSpot = kingPosition(teamColor, board);
-        for (int i = 0; i < 8; i++){
-            for (int j = 0; j < 8; j++){
+        for (int i = 1; i < 9; i++){
+            for (int j = 1; j < 9; j++){
                 ChessPosition newPosition = new ChessPosition(i,j);
                 ChessPiece newPiece = this.board.getPiece(newPosition);
                 if (newPiece != null && newPiece.getTeamColor() != teamColor){
@@ -184,7 +171,18 @@ public class ChessGame {
      */
     public boolean isInCheckmate(TeamColor teamColor) {
 //        king has to be in check, and there can't be any valid moves
-        return true;
+        if (isInCheck(teamColor)){
+            for (int i=1; i<9; i++){
+                for (int j=1; j<9; j++){
+                    ChessPosition newPosition = new ChessPosition(i,j);
+                    ChessPiece piece = board.getPiece(newPosition);
+                    if (piece != null && piece.getTeamColor() == teamColor && validMoves(newPosition)!=null){
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     /**
