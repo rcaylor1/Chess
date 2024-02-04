@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
 
+
 /**
  * For a class that can manage a chess game, making moves on a board
  * <p>
@@ -14,7 +15,7 @@ public class ChessGame {
     private TeamColor currentTeam;
     private ChessBoard board = new ChessBoard();
     public ChessGame() {
-        board.resetBoard(); //start with an empty board
+//        board.resetBoard(); //start with an empty board
         currentTeam = TeamColor.WHITE; //first team to start is always white
     }
 
@@ -50,7 +51,7 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        ChessPiece piece = this.board.getPiece(startPosition);
+        ChessPiece piece = board.getPiece(startPosition);
         if (piece == null){
             return null; //this is if there is no piece at the start position
         } else {
@@ -59,12 +60,17 @@ public class ChessGame {
 
             ChessBoard copyBoard;
             for (ChessMove pieceMove : pieceMoves){
-                copyBoard = board.copy();
-                clonedMove(pieceMove, copyBoard); //makes the move on the copied board
-                if (!clonedCheck(piece.getTeamColor(), copyBoard)){
+                ChessPiece move = board.getPiece(pieceMove.getEndPosition());
+                board.clonedMove(pieceMove);
+                if (!isInCheck(piece.getTeamColor())){
                     availableMoves.add(pieceMove);
                 }
-                undo(copyBoard, pieceMove);
+                board.clonedMove(pieceMove.undo());
+                board.addPiece(pieceMove.getEndPosition(), move);
+//                clonedMove(pieceMove, copyBoard); //makes the move on the copied board
+//                if (!clonedCheck(piece.getTeamColor(), copyBoard)){
+//                    availableMoves.add(pieceMove);
+//                }
             }
             return availableMoves;
         }
@@ -72,17 +78,13 @@ public class ChessGame {
 
 
     //make a method to simulate move on cloned board, so then you don't change the actual board
-    public void clonedMove(ChessMove move, ChessBoard board){
-//        need to get piece at the starting position of the move
-        ChessPiece piece = board.getPiece(move.getStartPosition());
-        board.addPiece(move.getEndPosition(), piece); //move piece to end position
-        board.addPiece(move.getStartPosition(), null); //clear out starting position
-    }
+//    public void clonedMove(ChessMove move, ChessBoard board){
+////        need to get piece at the starting position of the move
+//        ChessPiece piece = board.getPiece(move.getStartPosition());
+//        board.addPiece(move.getEndPosition(), piece); //move piece to end position
+//        board.addPiece(move.getStartPosition(), null); //clear out starting position
+//    }
 
-    public void undo(ChessBoard board, ChessMove move){
-        board.addPiece(move.getStartPosition(), board.getPiece(move.getEndPosition()));
-        board.addPiece(move.getEndPosition(), null);
-    }
 
 //make method to see if checkmate on cloned board to make things easier for me #worksmarternotharder
     public boolean clonedCheck(TeamColor color, ChessBoard board){
@@ -176,7 +178,7 @@ public class ChessGame {
                 for (int j=1; j<9; j++){
                     ChessPosition newPosition = new ChessPosition(i,j);
                     ChessPiece piece = board.getPiece(newPosition);
-                    if (piece != null && piece.getTeamColor() == teamColor && validMoves(newPosition)!=null){
+                    if (piece != null && piece.getTeamColor().equals(teamColor) && validMoves(newPosition)!=null){
                         return true;
                     }
                 }
@@ -194,11 +196,16 @@ public class ChessGame {
      */
     public boolean isInStalemate(TeamColor teamColor) {
 //        this is when there are absolutely no more valid moves that either team can make
-        if (isInCheck(teamColor)){
-            return false; //king cannot be in check for a stalemate to happen
-        } else {
-            return true;
+        for (int i = 1; i < 9; i++){
+            for (int j = 1; j < 9; j++){
+                ChessPosition newPosition = new ChessPosition(i,j);
+                ChessPiece newPiece = board.getPiece(newPosition);
+                if (newPiece != null && newPiece.getTeamColor().equals(teamColor) && !validMoves(newPosition).isEmpty()){
+                    return false;
+                }
+            }
         }
+        return true;
     }
 
 //    make method for king position to make other methods easier

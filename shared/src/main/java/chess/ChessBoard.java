@@ -96,6 +96,12 @@ public class ChessBoard {
         }
         return copyBoard;
     }
+    public void clonedMove(ChessMove move){
+//        need to get piece at the starting position of the move
+        ChessPiece piece = getPiece(move.getStartPosition());
+        addPiece(move.getEndPosition(), piece); //move piece to end position
+        addPiece(move.getStartPosition(), null); //clear out starting position
+    }
 
     @Override
     public boolean equals(Object o) {

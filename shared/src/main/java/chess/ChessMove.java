@@ -19,6 +19,9 @@ public class ChessMove {
         this.promotionPiece = promotionPiece;
     }
 
+    public ChessMove undo(){
+        return new ChessMove(endPosition, startPosition, null);
+    }
     /**
      * @return ChessPosition of starting location
      */
