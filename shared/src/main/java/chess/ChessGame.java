@@ -3,8 +3,6 @@ package chess;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
-import java.util.Iterator;
-import java.util.HashSet;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -63,14 +61,10 @@ public class ChessGame {
         for (ChessMove pieceMove : pieceMoves){
             copyBoard = board.copy();
             clonedMove(pieceMove, copyBoard); //makes the move on the copied board
-            availableMoves.add(pieceMove);
-        }
-//
-
-//        next step is to find valid moves
-//        I want to copy the board and see if I can make the move
-
-        return availableMoves;
+            if (!clonedCheck(piece.getTeamColor(), copyBoard)){
+                availableMoves.add(pieceMove);
+            }
+        } return availableMoves;
     }
 
     //make a method to simulate move on cloned board, so then you don't change the actual board
@@ -81,6 +75,13 @@ public class ChessGame {
         board.addPiece(move.getStartPosition(), null); //clear out starting position
     }
 
+//make method to see if checkmate on cloned board to make things easier for me #worksmarternotharder
+    public boolean clonedCheck(TeamColor color, ChessBoard board){
+//        first get the position of the king
+//        ChessPosition kingPosition = kingPosition(color, board);
+        return false;
+//        finish later
+    }
     /**
      * Makes a move in a chess game
      *
@@ -88,8 +89,31 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException{
-        throw new RuntimeException("Not implemented");
 //        this method should change the team turn
+        ChessPiece piece = board.getPiece(move.getStartPosition()); //get the piece at the starting position
+//        A move is illegal if the chess piece cannot move there, if the move leaves the team’s king in danger, or if it’s not the corresponding team's turn.
+//        check if valid move first
+        if (!validMoves(move.getStartPosition()).contains(move)){
+            throw new InvalidMoveException();
+        }
+        if (piece == null){
+            throw new InvalidMoveException(); //can't move a piece if there isn't a piece there in the first place lol
+        }
+        if (piece.getTeamColor() != currentTeam){
+            throw new InvalidMoveException(); //has to be the right team's turn
+        }
+        board.addPiece(move.getEndPosition(), piece); //move the piece to end position
+        board.addPiece(move.getStartPosition(), null); //clear starting position of that piece
+//have to account for promotions too
+        if (move.getPromotionPiece() != null){
+            board.addPiece(move.getEndPosition(), new ChessPiece(piece.getTeamColor(), move.getPromotionPiece()));
+        }
+//change the team color
+        if (currentTeam == TeamColor.WHITE){
+            currentTeam = TeamColor.BLACK;
+        } else if (currentTeam == TeamColor.BLACK){
+            currentTeam = TeamColor.WHITE;
+        }
     }
 
     /**
@@ -141,7 +165,7 @@ public class ChessGame {
         for (int i = 0; i < 8; i++){
             for (int j = 0; j < 8; j++){
                 ChessPosition kingPosition = new ChessPosition(i,j);
-                ChessPiece piece = board.getPiece(kingPosition);
+                ChessPiece piece = this.board.getPiece(kingPosition);
                 if (piece.getPieceType() == ChessPiece.PieceType.KING && piece.getTeamColor() == color){
                     return kingPosition;
                 }
