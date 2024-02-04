@@ -329,9 +329,6 @@ public class ChessPiece {
 
         return availablePawnMoves;
     }
-    public ChessPiece copyPiece(){
-        return new ChessPiece(this.pieceColor, this.type); //makes the copy of each piece
-    }
 
     @Override
     public boolean equals(Object o) {

@@ -15,7 +15,7 @@ public class ChessGame {
     private TeamColor currentTeam;
     private ChessBoard board = new ChessBoard();
     public ChessGame() {
-//        board.resetBoard(); //start with an empty board
+        board.resetBoard(); //start with an empty board
         currentTeam = TeamColor.WHITE; //first team to start is always white
     }
 
@@ -58,7 +58,6 @@ public class ChessGame {
             Collection<ChessMove> availableMoves = new ArrayList<>();
             Collection<ChessMove> pieceMoves = piece.pieceMoves(board, startPosition); //call pieceMoves from previous phase to access available moves
 
-            ChessBoard copyBoard;
             for (ChessMove pieceMove : pieceMoves){
                 ChessPiece move = board.getPiece(pieceMove.getEndPosition());
                 board.clonedMove(pieceMove);
@@ -67,45 +66,11 @@ public class ChessGame {
                 }
                 board.clonedMove(pieceMove.undo());
                 board.addPiece(pieceMove.getEndPosition(), move);
-//                clonedMove(pieceMove, copyBoard); //makes the move on the copied board
-//                if (!clonedCheck(piece.getTeamColor(), copyBoard)){
-//                    availableMoves.add(pieceMove);
-//                }
             }
             return availableMoves;
         }
     }
 
-
-    //make a method to simulate move on cloned board, so then you don't change the actual board
-//    public void clonedMove(ChessMove move, ChessBoard board){
-////        need to get piece at the starting position of the move
-//        ChessPiece piece = board.getPiece(move.getStartPosition());
-//        board.addPiece(move.getEndPosition(), piece); //move piece to end position
-//        board.addPiece(move.getStartPosition(), null); //clear out starting position
-//    }
-
-
-//make method to see if checkmate on cloned board to make things easier for me #worksmarternotharder
-    public boolean clonedCheck(TeamColor color, ChessBoard board){
-//        first get the position of the king
-        ChessPosition kingSpot = kingPosition(color, board);
-        for (int i = 1; i < 9; i++){
-            for (int j = 1; j < 9; j++){
-                ChessPosition newPosition = new ChessPosition(i,j);
-                ChessPiece newPiece = this.board.getPiece(newPosition);
-                if (newPiece != null && newPiece.getTeamColor() != color){
-                    Collection<ChessMove> moves = newPiece.pieceMoves(board, newPosition);
-                    for (ChessMove move:moves){
-                        if (move.getEndPosition().equals(kingSpot)){
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
-        return false;
-    }
     /**
      * Makes a move in a chess game
      *
@@ -165,6 +130,20 @@ public class ChessGame {
         return false;
     }
 
+//    make method for king position to make other methods easier
+public ChessPosition kingPosition (TeamColor color, ChessBoard board){
+    for (int i = 1; i < 9; i++){
+        for (int j = 1; j < 9; j++){
+            ChessPosition kingPosition = new ChessPosition(i,j);
+            ChessPiece piece = board.getPiece(kingPosition);
+            if (piece != null && piece.getPieceType().equals(ChessPiece.PieceType.KING) && piece.getTeamColor() == color){
+                return kingPosition;
+            }
+        }
+    }
+    return null;
+}
+
     /**
      * Determines if the given team is in checkmate
      *
@@ -208,21 +187,6 @@ public class ChessGame {
         return true;
     }
 
-//    make method for king position to make other methods easier
-    public ChessPosition kingPosition (TeamColor color, ChessBoard board){
-        for (int i = 0; i < 8; i++){
-            for (int j = 0; j < 8; j++){
-                ChessPosition kingPosition = new ChessPosition(i,j);
-                ChessPiece piece = board.getPiece(kingPosition);
-                if (piece != null && piece.getPieceType() == ChessPiece.PieceType.KING && piece.getTeamColor() == color){
-                    return kingPosition;
-                }
-            }
-        }
-        return null;
-    }
-
-
     /**
      * Sets this game's chessboard with a given board
      *
@@ -260,10 +224,5 @@ public class ChessGame {
                 "currentTeam=" + currentTeam +
                 ", board=" + board +
                 '}';
-    }
-
-    @Override
-    protected Object clone() throws CloneNotSupportedException {
-        return super.clone();
     }
 }

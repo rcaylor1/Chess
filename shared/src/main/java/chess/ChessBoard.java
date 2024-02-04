@@ -84,18 +84,6 @@ public class ChessBoard {
         squares[7][7] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK);
     }
 //    still trying to figure out how to copy
-    public ChessBoard copy() {
-        ChessBoard copyBoard = new ChessBoard();
-        for (int i = 0; i < 8; i++){
-            for (int j = 0; j < 8; j++){
-                if (squares[i][j] != null){
-                    copyBoard.squares[i][j] = squares[i][j].copyPiece(); //copies each chess piece on the board
-                }
-
-            }
-        }
-        return copyBoard;
-    }
     public void clonedMove(ChessMove move){
 //        need to get piece at the starting position of the move
         ChessPiece piece = getPiece(move.getStartPosition());
