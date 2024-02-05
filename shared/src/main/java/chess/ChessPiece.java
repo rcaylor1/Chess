@@ -268,7 +268,7 @@ public class ChessPiece {
         ChessPiece initialBlocked = board.getPiece(initialNewPosition);
 //        ChessMove initialMove = new ChessMove(position, new ChessPosition(newRow, newPosition.getColumn()),null);
         if ((position.getRow()==7 && newPiece.getTeamColor()==ChessGame.TeamColor.BLACK) || position.getRow()==2&&newPiece.getTeamColor()==ChessGame.TeamColor.WHITE){
-            if (initialBlocked == null && initialBlockedAgain == null && whiteBlocked == null){
+            if (initialBlocked == null && initialBlockedAgain == null || whiteBlocked == null){
                 availablePawnMoves.add(new ChessMove(position, initialNewPosition, null));
             }
         }

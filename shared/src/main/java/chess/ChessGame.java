@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
 
-
 /**
  * For a class that can manage a chess game, making moves on a board
  * <p>
@@ -83,7 +82,7 @@ public class ChessGame {
 //        A move is illegal if the chess piece cannot move there, if the move leaves the team’s king in danger, or if it’s not the corresponding team's turn.
 //        check if valid move first
         if (!validMoves(move.getStartPosition()).contains(move)){
-            throw new InvalidMoveException("hey");
+            throw new InvalidMoveException("invalid move");
         }
         if (piece == null){
             throw new InvalidMoveException(); //can't move a piece if there isn't a piece there in the first place lol
