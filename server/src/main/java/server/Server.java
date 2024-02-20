@@ -1,5 +1,6 @@
 package server;
 
+import exception.ResponseException;
 import spark.*;
 
 public class Server {
