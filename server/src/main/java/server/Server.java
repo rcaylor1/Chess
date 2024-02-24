@@ -1,15 +1,21 @@
 package server;
 
 import spark.*;
+import dataAccess.*;
+import service.ClearService;
+import server.ClearHandler;
 
 public class Server {
+
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
 
         Spark.staticFiles.location("web");
+        Spark.init();
 
-        // Register your endpoints and handle exceptions here.
+        Spark.delete("/db", this::clear);
+
         createRoutes();
         Spark.awaitInitialization();
         return Spark.port();
@@ -22,6 +28,7 @@ public class Server {
         Spark.stop();
         Spark.awaitStop();
     }
+
     public static void main(String[] args){
         new Server().run(8080);
     }
