@@ -27,9 +27,6 @@ public class Server {
     private static void createRoutes(){
         Spark.before((request, response) -> System.out.println("Executing route: " + request.pathInfo()));
     }
-    private Object clear(Request request, Response response) throws DataAccessException {
-        return clearHandler.clearServer(request,response);
-    }
 
     public void stop() {
         Spark.stop();
@@ -38,5 +35,9 @@ public class Server {
 
     public static void main(String[] args){
         new Server().run(8080);
+    }
+
+    private Object clear(Request request, Response response) throws DataAccessException {
+        return clearHandler.clear(request,response);
     }
 }

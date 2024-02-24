@@ -12,7 +12,7 @@ public class ClearHandler {
         service = new ClearService(user, game, auth);
     }
 
-    public Object clearServer(Request request, Response response) throws DataAccessException{
+    public Object clear(Request request, Response response) throws DataAccessException{
             service.clear();
             response.status(200);
             return "{}";
