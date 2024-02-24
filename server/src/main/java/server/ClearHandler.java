@@ -14,9 +14,9 @@ public class ClearHandler {
     }
 
     private Object clearServer(Request request, Response response) throws DataAccessException{
-            service.clear();
-            response.status(200);
-            return new Gson().toJson(null);
+        service.clear();
+        response.status(200);
+        return new Gson().toJson(null);
 //            response.status(500);
 //            return new Gson().toJson(new ClearHandler(exception.getMessage()));
 
