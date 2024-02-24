@@ -12,16 +12,11 @@ public class MemoryGameDAO implements GameDAO{
     }
 
     public void createGame(GameData game) throws DataAccessException{
-        for (GameData data : games.values()){
-            if (!game.gameName().equals(data.gameName())){
-                games.put(game.gameID(), game);
-            }
-        }
-        throw new DataAccessException("Game already exists");
+        games.put(game.gameID(), game);
     }
 
-    public GameData getGame(GameData game) throws DataAccessException{
-        return games.getOrDefault(game.gameID(), null);
+    public GameData getGame(Integer gameID) throws DataAccessException{
+        return (games.getOrDefault(gameID, null));
     }
 
     public ArrayList<GameData> listGames() throws DataAccessException{
