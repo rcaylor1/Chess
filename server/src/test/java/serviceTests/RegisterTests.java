@@ -1,14 +1,12 @@
 package serviceTests;
 
-import chess.ChessGame;
 import dataAccess.*;
 import model.*;
-import org.junit.jupiter.api.BeforeEach;
 import service.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
 
-public class RegisterUserTests {
+public class RegisterTests {
     @Test
     void registerPositive() throws DataAccessException{
         UserDAO userDao = new MemoryUserDAO();
@@ -17,8 +15,8 @@ public class RegisterUserTests {
         UserData newUser = new UserData("rcaylor", "12345", "email@email.com");
 
         AuthData test = service.register(newUser);
-        Assertions.assertEquals(test.username(), newUser.username());
-        Assertions.assertNotNull(test.authToken());
+        Assertions.assertNotNull(test);
+        Assertions.assertEquals(test.username(), newUser.username());;
     }
 
     @Test

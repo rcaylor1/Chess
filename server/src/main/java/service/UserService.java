@@ -1,7 +1,6 @@
 package service;
 
 import dataAccess.*;
-import exception.ResponseException;
 import model.*;
 
 import java.util.UUID;
@@ -17,10 +16,23 @@ public class UserService {
 
     public AuthData register(UserData userData) throws DataAccessException {
         if (user.getUser(userData.username())!=null){
-            throw new DataAccessException("Error: Username already in use");
+            throw new DataAccessException("Error: already taken");
         } else {
             user.createUser(userData);
             AuthData data = generateAuth(userData.username());
+            auth.createAuth(data);
+            return data;
+        }
+    }
+
+    public AuthData login(LoginRequest loginRequest) throws DataAccessException{
+        UserData newUser = user.getUser(loginRequest.username());
+        if (newUser == null){
+            throw new DataAccessException("Error: unauthorized");
+        } if (!newUser.password().equals(loginRequest.password())){
+            throw new DataAccessException("Error: unauthorized");
+        } else {
+            AuthData data = generateAuth(loginRequest.username());
             auth.createAuth(data);
             return data;
         }
