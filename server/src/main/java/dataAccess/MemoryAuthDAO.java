@@ -14,7 +14,7 @@ public class MemoryAuthDAO implements AuthDAO{
     }
 
     public AuthData createAuth(AuthData auth) throws DataAccessException{
-            return auths.put(auth.authToken(), auth);
+        return auths.put(auth.authToken(), auth);
     }
 
     public AuthData getAuth(String auth) throws DataAccessException{
@@ -24,7 +24,7 @@ public class MemoryAuthDAO implements AuthDAO{
         return null;
     }
 
-    public void deleteAuth(AuthData auth) throws DataAccessException{
-        auths.remove(auth.username());
+    public void deleteAuth(String authToken) throws DataAccessException{
+        auths.remove(authToken);
     }
 }
