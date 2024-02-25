@@ -2,6 +2,7 @@ package serviceTests;
 
 import chess.ChessGame;
 import dataAccess.*;
+import dataAccess.Exceptions.DataAccessException;
 import model.*;
 import service.ClearService;
 import org.junit.jupiter.api.Test;
@@ -9,7 +10,7 @@ import org.junit.jupiter.api.Assertions;
 
 public class ClearServiceTest {
     @Test
-    void clearTest() throws DataAccessException{
+    void clearTest() throws DataAccessException {
 
         UserDAO testUser = new MemoryUserDAO();
         GameDAO testGame = new MemoryGameDAO();

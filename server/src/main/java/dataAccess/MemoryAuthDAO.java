@@ -1,15 +1,14 @@
 package dataAccess;
 
+import dataAccess.Exceptions.DataAccessException;
 import model.AuthData;
 
-import javax.xml.crypto.Data;
 import java.util.HashMap;
-import java.util.UUID;
 
 public class MemoryAuthDAO implements AuthDAO{
     private final HashMap<String, AuthData> auths = new HashMap<>();
 
-    public void clear() throws DataAccessException{
+    public void clear() throws DataAccessException {
         auths.clear();
     }
 

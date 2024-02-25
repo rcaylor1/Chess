@@ -1,16 +1,15 @@
 package serviceTests;
 
 import dataAccess.*;
+import dataAccess.Exceptions.DataAccessException;
 import model.*;
 import service.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
 
-import javax.xml.crypto.Data;
-
 public class LogoutTests {
     @Test
-    void logoutPositive() throws DataAccessException{
+    void logoutPositive() throws DataAccessException {
         UserDAO userDao = new MemoryUserDAO();
         AuthDAO authDao = new MemoryAuthDAO();
         UserService service  = new UserService(userDao, authDao);
@@ -20,7 +19,7 @@ public class LogoutTests {
     }
 
     @Test
-    void logoutNegative() throws DataAccessException {
+    void logoutNegative() throws DataAccessException{
         UserDAO userDao = new MemoryUserDAO();
         AuthDAO authDao = new MemoryAuthDAO();
         UserService service  = new UserService(userDao, authDao);

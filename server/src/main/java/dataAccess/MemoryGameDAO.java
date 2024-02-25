@@ -1,5 +1,6 @@
 package dataAccess;
 
+import dataAccess.Exceptions.DataAccessException;
 import model.GameData;
 
 import java.util.ArrayList;
@@ -7,7 +8,7 @@ import java.util.HashMap;
 public class MemoryGameDAO implements GameDAO{
     private final HashMap<Integer, GameData> games = new HashMap<>();
 
-    public void clear() throws DataAccessException{
+    public void clear() throws DataAccessException {
         games.clear();
     }
 
