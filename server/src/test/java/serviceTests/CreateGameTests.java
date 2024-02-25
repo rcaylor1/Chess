@@ -1,12 +1,10 @@
 package serviceTests;
 
-import chess.ChessGame;
 import dataAccess.*;
 import model.*;
 import service.GameService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
-import java.util.ArrayList;
 
 public class CreateGameTests {
     @Test
