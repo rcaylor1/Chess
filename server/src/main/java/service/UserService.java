@@ -38,6 +38,12 @@ public class UserService {
         }
     }
 
+//    public void logout(String authToken) throws DataAccessException {
+//        if (auth.getAuth(authToken) == null) {
+//            throw new DataAccessException();
+//        }
+//    }
+
     private AuthData generateAuth(String username){
         String authToken = UUID.randomUUID().toString();
         return new AuthData(authToken, username);

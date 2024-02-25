@@ -18,7 +18,7 @@ public class Server {
 
         Spark.staticFiles.location("web");
 
-//        Spark.delete("/db", this::clear);
+        Spark.delete("/db", this::clear);
 
         createRoutes();
         Spark.awaitInitialization();
