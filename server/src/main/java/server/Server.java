@@ -5,10 +5,8 @@ import dataAccess.*;
 import model.*;
 import service.*;
 import spark.*;
-import exception.*;
 
 import java.util.Map;
-import java.util.Collections;
 
 public class Server {
     private final UserDAO userDAO = new MemoryUserDAO();
