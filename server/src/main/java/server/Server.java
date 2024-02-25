@@ -22,6 +22,8 @@ public class Server {
         Spark.post("/user", this::register);
         Spark.post("/session", this::login);
         Spark.delete("/session", this::logout);
+        Spark.get("/game", this::listGames);
+//        Spark.post("/game", this::createGame);
 
         createRoutes();
         Spark.awaitInitialization();
@@ -76,9 +78,9 @@ public class Server {
             AuthData returnAuth = service.login(loginRequest);
             response.status(200);
             return gson.toJson(returnAuth);
-        } catch (DataAccessException accessException) {
+        } catch (DataAccessException e) {
             response.status(401);
-            return gson.toJson(new ResponseMessage(accessException.getMessage()));
+            return gson.toJson(new ResponseMessage(e.getMessage()));
         }
     }
 
@@ -90,10 +92,39 @@ public class Server {
             response.status(200);
             return "{}";
         }
-        catch (DataAccessException accessException) {
+        catch (DataAccessException e) {
             response.status(401);
-            return new Gson().toJson(new ResponseMessage(accessException.getMessage()));
+            return new Gson().toJson(new ResponseMessage(e.getMessage()));
         }
     }
+
+    private Object listGames(Request request, Response response){
+        GameService service = new GameService(gameDAO, authDAO);
+        String authToken = request.headers("authorization");
+        try {
+            var list = service.listGames(authToken).toArray();
+            response.status(200);
+            return new Gson().toJson(Map.of("games", list));
+        }
+        catch (DataAccessException e) {
+            response.status(401);
+            return new Gson().toJson(new ResponseMessage(e.getMessage()));
+        }
+    }
+
+//    private Object createGame(Request request, Response response){
+//        GameService service = new GameService(gameDAO, authDAO);
+//        String authToken = request.headers("authorization");
+//        try {
+//            GameData game = new Gson().fromJson(request.body(), GameData.class);
+//            GameData resultGame = service.createGame(authToken, game.gameName());
+//            response.status(200);
+//            return new Gson().toJson(new GameID(resultGame.gameID()));
+//        }
+//        catch (DataAccessException e) {
+//            response.status(401);
+//            return new Gson().toJson(new ResponseMessage(e.getMessage()));
+//        }
+//    }
 
 }

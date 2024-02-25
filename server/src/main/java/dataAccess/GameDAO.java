@@ -9,4 +9,6 @@ public interface GameDAO {
     public GameData getGame(Integer gameID) throws DataAccessException;
     public ArrayList<GameData> listGames() throws DataAccessException;
     public void updateGame(GameData game) throws DataAccessException;
+
+    public int incID();
 }

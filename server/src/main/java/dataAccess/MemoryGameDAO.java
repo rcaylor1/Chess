@@ -29,4 +29,9 @@ public class MemoryGameDAO implements GameDAO{
         } else
             throw new DataAccessException("Unable to update");
     }
+
+    public int newID = 0;
+    public int incID(){
+        return newID++;
+    }
 }
