@@ -2,10 +2,13 @@ package server;
 
 import com.google.gson.Gson;
 import dataAccess.*;
-import dataAccess.Exceptions.*;
 import model.*;
 import service.*;
 import spark.*;
+import exception.*;
+
+import java.util.Map;
+import java.util.Collections;
 
 public class Server {
     private final UserDAO userDAO = new MemoryUserDAO();
@@ -19,6 +22,8 @@ public class Server {
 
         Spark.delete("/db", this::clear);
         Spark.post("/user", this::register);
+        Spark.post("/session", this::login);
+        Spark.delete("/session", this::logout);
 
         createRoutes();
         Spark.awaitInitialization();
@@ -44,23 +49,53 @@ public class Server {
         return "{}";
     }
 
-    private Object register(Request req, Response res) throws DataAccessException{
+    private Object register(Request req, Response res) {
+        Gson gson = new Gson();
         UserService service = new UserService(userDAO, authDAO);
-        UserData userData = new Gson().fromJson(req.body(), UserData.class);
-
+        UserData user = gson.fromJson(req.body(), UserData.class);
+//        first method/logic wasn't working so gotta try again lol
         try {
-            AuthData authData = service.register(userData);
-            res.status(200);
-            return new Gson().toJson(authData);
-        } catch (BadRequest badRequest){
-            res.status(400);
-            return new Gson().toJson(badRequest.getMessage());
-        } catch (AlreadyTaken alreadyTaken){
+            if (user.password() == null) { //check if it's valid
+                res.status(400);
+                return gson.toJson(Map.of("message", "Error: bad request")); //saw this method on petshop so hopefully it works
+            } else {
+                res.status(200);
+                AuthData data = service.register(user);
+                return gson.toJson(data);
+            }
+        }
+        catch (DataAccessException exception){
             res.status(403);
-            return new Gson().toJson(alreadyTaken.getMessage());
-        } catch (DataAccessException exception){
-            res.status(500);
-            return new Gson().toJson(exception.getMessage());
+            return gson.toJson(new ResponseMessage(exception.getMessage()));
         }
     }
+
+    private Object login(Request request, Response response) {
+        Gson gson = new Gson();
+        LoginRequest loginRequest = gson.fromJson(request.body(), LoginRequest.class);
+        UserService service = new UserService(userDAO, authDAO);
+        try {
+            AuthData returnAuth = service.login(loginRequest);
+            response.status(200);
+            return gson.toJson(returnAuth);
+        } catch (DataAccessException accessException) {
+            response.status(401);
+            return gson.toJson(new ResponseMessage(accessException.getMessage()));
+        }
+    }
+
+    private Object logout(Request request, Response response){
+        UserService service = new UserService(userDAO, authDAO);
+        String authToken = request.headers("authorization");
+        try {
+            service.logout(authToken);
+            response.status(200);
+            return "{}";
+        }
+        catch (DataAccessException accessException) {
+            response.status(401);
+            return new Gson().toJson(new ResponseMessage(accessException.getMessage()));
+        }
+    }
+
 }

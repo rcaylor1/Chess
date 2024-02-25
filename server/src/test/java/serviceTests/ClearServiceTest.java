@@ -2,7 +2,6 @@ package serviceTests;
 
 import chess.ChessGame;
 import dataAccess.*;
-import dataAccess.Exceptions.DataAccessException;
 import model.*;
 import service.ClearService;
 import org.junit.jupiter.api.Test;

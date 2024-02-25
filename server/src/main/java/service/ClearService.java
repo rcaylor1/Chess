@@ -1,7 +1,6 @@
 package service;
 
 import dataAccess.*;
-import dataAccess.Exceptions.DataAccessException;
 
 public class ClearService {
     private final UserDAO user;

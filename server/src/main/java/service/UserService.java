@@ -1,7 +1,6 @@
 package service;
 
 import dataAccess.*;
-import dataAccess.Exceptions.DataAccessException;
 import model.*;
 
 import java.util.UUID;
