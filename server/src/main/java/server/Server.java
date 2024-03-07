@@ -9,11 +9,25 @@ import spark.*;
 import java.util.ArrayList;
 import dataAccess.Exceptions.*;
 import dataAccess.SQLUserDAO;
+import dataAccess.SQLGameDAO;
+import dataAccess.SQLAuthDAO;
 
 public class Server {
-    private final UserDAO userDAO = new MemoryUserDAO();
-    private final GameDAO gameDAO = new MemoryGameDAO();
-    private final AuthDAO authDAO = new MemoryAuthDAO();
+//    private final UserDAO userDAO = new MemoryUserDAO();
+//    private final GameDAO gameDAO = new MemoryGameDAO();
+//    private final AuthDAO authDAO = new MemoryAuthDAO();
+    UserDAO userDAO;
+    GameDAO gameDAO;
+    AuthDAO authDAO;
+    public Server(){
+        try {
+            userDAO = new SQLUserDAO();
+            gameDAO = new SQLGameDAO();
+            authDAO = new SQLAuthDAO();
+        } catch (DataAccessException e){
+            throw new RuntimeException(e);
+        }
+    }
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);

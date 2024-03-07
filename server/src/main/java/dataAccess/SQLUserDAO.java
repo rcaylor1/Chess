@@ -22,14 +22,14 @@ public class SQLUserDAO implements UserDAO{
     public void createUser(UserData user) throws DataAccessException{
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         String hashedPassword = encoder.encode(user.password());
-        String statement = "INSERT INTO user (username, password, email) VALUES (?, ?, ?)";
+        String statement = "INSERT INTO User (username, password, email) VALUES (?, ?, ?)";
         executeUpdate(statement, user.username(), hashedPassword, user.email());
     }
 
     @Override
     public UserData getUser(String username) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT * FROM user WHERE username=?";
+            var statement = "SELECT * FROM User WHERE username=?";
             try (var ps = conn.prepareStatement(statement)) {
                 ps.setString(1, username);
                 try (var rs = ps.executeQuery()) {

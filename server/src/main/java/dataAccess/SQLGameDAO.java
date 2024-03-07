@@ -18,20 +18,20 @@ public class SQLGameDAO implements GameDAO{
 
     @Override
     public void clear() throws DataAccessException{
-        var statement = "TRUNCATE Game";
+        var statement = "TRUNCATE game";
         executeUpdate(statement);
     }
 
     @Override
     public void createGame(GameData game) throws DataAccessException{
-        String statement = "INSERT INTO Game (gameID, whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?, ?)";
+        String statement = "INSERT INTO game (gameID, whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?, ?)";
         executeUpdate(statement, game.gameID(), null, null, game.gameName(), game.game());
     }
 
     @Override
     public GameData getGame(Integer gameID) throws DataAccessException{
         try (var conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT * FROM Game WHERE gameID=?";
+            var statement = "SELECT * FROM game WHERE gameID=?";
             try (var ps = conn.prepareStatement(statement)) {
                 ps.setInt(1, gameID);
                 try (var rs = ps.executeQuery()) {
