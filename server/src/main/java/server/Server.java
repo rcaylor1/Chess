@@ -8,8 +8,7 @@ import service.*;
 import spark.*;
 import java.util.ArrayList;
 import dataAccess.Exceptions.*;
-
-import java.util.Map;
+import dataAccess.SQLUserDAO;
 
 public class Server {
     private final UserDAO userDAO = new MemoryUserDAO();
