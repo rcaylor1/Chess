@@ -20,10 +20,10 @@ public class SQLUserDAO implements UserDAO{
 
     @Override
     public void createUser(UserData user) throws DataAccessException{
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        String hashedPassword = encoder.encode(user.password());
+//        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+//        String hashedPassword = encoder.encode(user.password());
         String statement = "INSERT INTO User (username, password, email) VALUES (?, ?, ?)";
-        executeUpdate(statement, user.username(), hashedPassword, user.email());
+        executeUpdate(statement, user.username(), user.password(), user.email());
     }
 
     @Override

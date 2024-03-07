@@ -22,9 +22,9 @@ public class Server {
     public Server(){
         try {
             userDAO = new SQLUserDAO();
-            gameDAO = new SQLGameDAO();
-            authDAO = new SQLAuthDAO();
-        } catch (DataAccessException e){
+            gameDAO = new MemoryGameDAO();
+            authDAO = new MemoryAuthDAO();
+        }catch (DataAccessException e){
             throw new RuntimeException(e);
         }
     }
@@ -82,7 +82,7 @@ public class Server {
         }
     }
 
-    private Object login(Request request, Response response) {
+    private Object login(Request request, Response response){
         LoginRequest loginRequest = new Gson().fromJson(request.body(), LoginRequest.class);
         UserService service = new UserService(userDAO, authDAO);
         try {
