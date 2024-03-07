@@ -91,9 +91,9 @@ public class SQLUserDAO implements UserDAO{
     }
 
     private UserData readUser(ResultSet rs) throws SQLException {
-        String username = rs.getString("username");
-        String passwordHashed = rs.getString("password");
-        String email = rs.getString("email");
+        var username = rs.getString("username");
+        var passwordHashed = rs.getString("password");
+        var email = rs.getString("email");
         return new UserData(username, passwordHashed, email);
     }
 }

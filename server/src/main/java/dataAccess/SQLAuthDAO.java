@@ -2,7 +2,6 @@ package dataAccess;
 
 import dataAccess.Exceptions.*;
 import model.AuthData;
-import model.UserData;
 
 import java.sql.*;
 import java.util.UUID;
@@ -60,7 +59,7 @@ public class SQLAuthDAO implements AuthDAO{
               `username` varchar(256) NOT NULL,
               PRIMARY KEY (`authToken`),
               INDEX (`username`)
-            )
+            );
             """
     };
 
@@ -99,8 +98,8 @@ public class SQLAuthDAO implements AuthDAO{
     }
 
     private AuthData readAuth(ResultSet rs) throws SQLException {
-        String authToken = rs.getString("authToken");
-        String username = rs.getString("username");
+        var authToken = rs.getString("authToken");
+        var username = rs.getString("username");
         return new AuthData(authToken, username);
     }
 }
