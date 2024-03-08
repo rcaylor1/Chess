@@ -25,9 +25,7 @@ public class SQLGameDAO implements GameDAO{
     @Override
     public void createGame(GameData newGame) throws DataAccessException{
         String statement = "INSERT INTO game (gameID, whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?, ?)";
-        String gameJson = new Gson().toJson(newGame.game());
         executeUpdate(statement, newGame.gameID(), null, null, newGame.gameName(), new Gson().toJson(newGame.game()));
-//        executeUpdate(statement, newGame.gameID(), newGame);
     }
 
     @Override
@@ -70,7 +68,7 @@ public class SQLGameDAO implements GameDAO{
         executeUpdate(statement, game.whiteUsername(), game.blackUsername(), game.gameName(), new Gson().toJson(game.game()), game.gameID());
     }
 
-    public int newID = 0;
+    public int newID = 1;
     @Override
     public int incID(){
         return newID++;
