@@ -3,6 +3,7 @@ package service;
 import dataAccess.*;
 import dataAccess.Exceptions.*;
 import model.*;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.UUID;
 
@@ -33,9 +34,14 @@ public class UserService {
         UserData newUser = user.getUser(loginRequest.username());
         if (newUser == null){
             throw new UnauthorizedException("Error: unauthorized");
-        } if (!newUser.password().equals(loginRequest.password())){
+        }
+//        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+//
+//        if (!encoder.matches(newUser.password(), loginRequest.password())) throw new DataAccessException("Error: incorrect password");
+        if (!newUser.password().equals(loginRequest.password())){
             throw new DataAccessException("Error: unauthorized");
-        } else {
+        }
+        else {
             AuthData data = generateAuth(loginRequest.username());
             auth.createAuth(data);
             return data;

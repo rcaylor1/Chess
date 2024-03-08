@@ -22,16 +22,16 @@ public class SQLAuthDAO implements AuthDAO{
 
     @Override
     public AuthData createAuth(AuthData auth) throws DataAccessException{
-        String authToken = UUID.randomUUID().toString();
-        String statement = "INSERT INTO Auth (username, authToken) VALUES (?, ?)";
-        executeUpdate(statement, authToken, auth.username());
-        return new AuthData(authToken, auth.username());
+//        String authToken = UUID.randomUUID().toString();
+        String statement = "INSERT INTO Auth (authToken, username) VALUES (?, ?)";
+        executeUpdate(statement, auth.authToken(), auth.username());
+        return new AuthData(auth.authToken(), auth.username());
     }
 
     @Override
     public AuthData getAuth(String auth) throws DataAccessException{
         try (var conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT username, authToken FROM Auth WHERE username=?";
+            var statement = "SELECT username, authToken FROM Auth WHERE authToken=?";
             try (var ps = conn.prepareStatement(statement)) {
                 ps.setString(1, auth);
                 try (var rs = ps.executeQuery()) {
@@ -49,7 +49,7 @@ public class SQLAuthDAO implements AuthDAO{
     @Override
     public void deleteAuth(String authToken) throws DataAccessException{
         var statement = "DELETE FROM Auth WHERE authToken =?";
-        executeUpdate(statement);
+        executeUpdate(statement, authToken);
     }
 
     private final String[] createStatements = {

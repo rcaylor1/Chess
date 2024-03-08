@@ -22,8 +22,8 @@ public class Server {
     public Server(){
         try {
             userDAO = new SQLUserDAO();
-            gameDAO = new MemoryGameDAO();
-            authDAO = new MemoryAuthDAO();
+            gameDAO = new SQLGameDAO();
+            authDAO = new SQLAuthDAO();
         }catch (DataAccessException e){
             throw new RuntimeException(e);
         }
@@ -33,6 +33,13 @@ public class Server {
         Spark.port(desiredPort);
 
         Spark.staticFiles.location("web");
+
+//        try {
+//            DatabaseManager.createDatabase();
+//        }
+//        catch (DataAccessException accessException) {
+//            System.out.println(accessException.getMessage());
+//        }
 
         Spark.delete("/db", this::clear);
         Spark.post("/user", this::register);

@@ -1,6 +1,7 @@
 package service;
 
-import dataAccess.*;
+import dataAccess.GameDAO;
+import dataAccess.AuthDAO;
 import dataAccess.Exceptions.*;
 import model.*;
 import chess.ChessGame;
