@@ -2,6 +2,7 @@ package ui;
 
 import com.google.gson.Gson;
 import model.AuthData;
+import model.GameData;
 import model.UserData;
 
 import java.io.*;
@@ -22,6 +23,11 @@ public class ServerFacade {
     public AuthData login(UserData newUser) throws ResponseException{
         var path = "/session";
         return this.makeRequest("POST", path, newUser, AuthData.class, null);
+    }
+
+    public GameData logout(String authToken) throws ResponseException{
+        var path = "/session";
+        return this.makeRequest("DELETE", path, null, GameData.class, authToken);
     }
 
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, String header) throws ResponseException {
@@ -79,8 +85,6 @@ public class ServerFacade {
     private boolean isSuccessful(int status) {
         return status / 100 == 2;
     }
-//    login
-//    logout
 //    create game
 //    list game
 //    join game
