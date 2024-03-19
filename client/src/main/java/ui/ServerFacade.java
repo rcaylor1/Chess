@@ -19,6 +19,11 @@ public class ServerFacade {
         return this.makeRequest("POST", path, newUser, AuthData.class, null);
     }
 
+    public AuthData login(UserData newUser) throws ResponseException{
+        var path = "/session";
+        return this.makeRequest("POST", path, newUser, AuthData.class, null);
+    }
+
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, String header) throws ResponseException {
         try {
             URL url = (new URI(serverUrl + path)).toURL();
