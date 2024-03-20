@@ -1,9 +1,8 @@
 package ui;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
-import model.AuthData;
-import model.GameData;
-import model.UserData;
+import model.*;
 
 import java.io.*;
 import java.net.*;
@@ -17,20 +16,37 @@ public class ServerFacade {
 
     public AuthData register(UserData newUser) throws ResponseException{
         var path = "/user";
-        return this.makeRequest("POST", path, newUser, AuthData.class, null);
+        return this.makeRequest("POST", path, newUser, null, AuthData.class);
     }
 
     public AuthData login(UserData newUser) throws ResponseException{
         var path = "/session";
-        return this.makeRequest("POST", path, newUser, AuthData.class, null);
+        return this.makeRequest("POST", path, newUser, null, AuthData.class);
     }
 
     public GameData logout(String authToken) throws ResponseException{
         var path = "/session";
-        return this.makeRequest("DELETE", path, null, GameData.class, authToken);
+        return this.makeRequest("DELETE", path, null, authToken, GameData.class);
     }
 
-    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, String header) throws ResponseException {
+    public GameData createGame(GameData game, String authToken) throws ResponseException{
+        var path = "/game";
+//        GameData newGame = new GameData(1, null, null, game, new ChessGame());
+        return this.makeRequest("POST", path, game, authToken, GameData.class);
+    }
+
+    public GameData[] listGames(String authToken) throws ResponseException{
+        var path = "/game";
+        ListGameRequest listGames = this.makeRequest("GET", path, null, authToken, ListGameRequest.class);
+        return listGames.gamesList();
+    }
+
+    public void joinGame(JoinGameRequest join, String authToken) throws ResponseException{
+        var path = "/game";
+        this.makeRequest("PUT", path, join, authToken, null);
+    }
+
+    private <T> T makeRequest(String method, String path, Object request, String header, Class<T> responseClass) throws ResponseException {
         try {
             URL url = (new URI(serverUrl + path)).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
@@ -85,9 +101,4 @@ public class ServerFacade {
     private boolean isSuccessful(int status) {
         return status / 100 == 2;
     }
-//    create game
-//    list game
-//    join game
-
-//    write main
 }
