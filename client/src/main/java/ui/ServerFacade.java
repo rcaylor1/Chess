@@ -6,8 +6,6 @@ import model.*;
 
 import java.io.*;
 import java.net.*;
-import java.util.HashMap;
-import java.util.Map;
 
 public class ServerFacade {
     private final String serverUrl;
@@ -68,7 +66,6 @@ public class ServerFacade {
         }
     }
 
-
     private static void writeBody(Object request, HttpURLConnection http) throws IOException {
         if (request != null) {
             http.addRequestProperty("Content-Type", "application/json");
@@ -98,7 +95,6 @@ public class ServerFacade {
         }
         return response;
     }
-
 
     private boolean isSuccessful(int status) {
         return status / 100 == 2;

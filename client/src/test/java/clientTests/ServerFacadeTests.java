@@ -11,10 +11,6 @@ import server.Server;
 import ui.ResponseException;
 import ui.ServerFacade;
 
-import java.util.ArrayList;
-import java.util.Objects;
-import java.util.Vector;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 
