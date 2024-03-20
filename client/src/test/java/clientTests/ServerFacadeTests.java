@@ -132,12 +132,13 @@ public class ServerFacadeTests {
         var newAuth = facade.register(newUser);
         GameData game1 = new GameData(1, "white", "black", "Game1", new ChessGame());
         GameData newGame1 = facade.createGame(game1, newAuth.authToken());
-        facade.joinGame(new JoinGameRequest("WHITE", 1), newAuth.authToken());
-
+        Assertions.assertDoesNotThrow(() -> facade.joinGame(new JoinGameRequest("WHITE", newGame1.gameID()), newAuth.authToken()));
     }
 
     @Test
     void joinGameNegative() throws ResponseException {
-
+        UserData newUser = new UserData("player1", "password", "p1@email.com");
+        var newAuth = facade.register(newUser);
+        Assertions.assertThrows(ResponseException.class, () -> facade.joinGame(new JoinGameRequest("WHITE", 1), newAuth.authToken()));
     }
 }
