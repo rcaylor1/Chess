@@ -1,4 +1,4 @@
 package model;
 
-public record ListGameRequest(GameData[] gamesList) {
+public record ListGameRequest(GameData[] games) {
 }
