@@ -19,8 +19,14 @@ public class ServerFacade {
         return this.makeRequest("POST", path, newUser, null, AuthData.class);
     }
 
-    public AuthData login(UserData newUser) throws ResponseException{
+//    public AuthData login(UserData newUser) throws ResponseException{
+//        var path = "/session";
+////        LoginRequest newLogin = new LoginRequest(username, password);
+//        return this.makeRequest("POST", path, newUser, null, AuthData.class);
+//    }
+    public AuthData login(String username, String password) throws ResponseException{
         var path = "/session";
+        UserData newUser = new UserData(username, password, null);
         return this.makeRequest("POST", path, newUser, null, AuthData.class);
     }
 

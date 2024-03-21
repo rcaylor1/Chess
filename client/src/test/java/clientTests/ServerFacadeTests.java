@@ -61,21 +61,21 @@ public class ServerFacadeTests {
     void loginPositive() throws ResponseException {
         UserData newUser = new UserData("player1", "password", "p1@email.com");
         facade.register(newUser);
-        var authData = facade.login(newUser);
+        var authData = facade.login(newUser.username(), newUser.password());
         Assertions.assertTrue(authData.authToken().length() > 10);
     }
 
     @Test
     void loginNegative() throws ResponseException {
         UserData user1 = new UserData("player1", "password", "p1@email.com");
-        Assertions.assertThrows(ResponseException.class, ()-> facade.login(user1));
+        Assertions.assertThrows(ResponseException.class, ()-> facade.login(user1.username(), user1.password()));
     }
 
     @Test
     void logoutPositive() throws ResponseException {
         UserData newUser = new UserData("player1", "password", "p1@email.com");
         var authData = facade.register(newUser);
-        facade.login(newUser);
+        facade.login(newUser.username(), newUser.password());
         facade.logout(authData.authToken());
         Assertions.assertThrows(ResponseException.class, () -> facade.logout(authData.authToken()));
     }
@@ -84,7 +84,7 @@ public class ServerFacadeTests {
     void logoutNegative() throws ResponseException {
         UserData newUser = new UserData("player1", "password", "p1@email.com");
         var authData = facade.register(newUser);
-        facade.login(newUser);
+        facade.login(newUser.username(), newUser.password());
         Assertions.assertDoesNotThrow(() -> facade.logout(authData.authToken()));
     }
 
