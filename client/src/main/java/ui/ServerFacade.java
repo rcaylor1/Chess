@@ -19,16 +19,15 @@ public class ServerFacade {
         return this.makeRequest("POST", path, newUser, null, AuthData.class);
     }
 
-//    public AuthData login(UserData newUser) throws ResponseException{
-//        var path = "/session";
-////        LoginRequest newLogin = new LoginRequest(username, password);
-//        return this.makeRequest("POST", path, newUser, null, AuthData.class);
-//    }
-    public AuthData login(String username, String password) throws ResponseException{
+    public AuthData login(UserData newUser) throws ResponseException{
         var path = "/session";
-        UserData newUser = new UserData(username, password, null);
         return this.makeRequest("POST", path, newUser, null, AuthData.class);
     }
+//    public AuthData login(String username, String password) throws ResponseException{
+//        var path = "/session";
+//        UserData newUser = new UserData(username, password, null);
+//        return this.makeRequest("POST", path, newUser, null, AuthData.class);
+//    }
 
     public GameData logout(String authToken) throws ResponseException{
         var path = "/session";
@@ -37,7 +36,6 @@ public class ServerFacade {
 
     public GameData createGame(GameData game, String authToken) throws ResponseException{
         var path = "/game";
-//        GameData newGame = new GameData(1, null, null, game, new ChessGame());
         return this.makeRequest("POST", path, game, authToken, GameData.class);
     }
 

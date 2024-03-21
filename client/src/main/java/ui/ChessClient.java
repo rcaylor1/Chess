@@ -58,9 +58,9 @@ public class ChessClient {
         String username = scanner.nextLine();
         System.out.print("Password: ");
         String password = scanner.nextLine();
-//        UserData newUser = new UserData(username, password, null);
-        String loggedIn = facade.login(username, password).authToken();
-//        postLogin(loggedIn);
+        UserData newUser = new UserData(username, password, null);
+        String loggedIn = facade.login(newUser).authToken();
+        postLogin(loggedIn);
     }
 
     private void register() throws ResponseException{
@@ -79,5 +79,4 @@ public class ChessClient {
     private void postLogin(String authToken) {
         System.out.println("Successfully logged in");
     }
-
 }
