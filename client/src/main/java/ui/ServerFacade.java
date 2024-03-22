@@ -23,11 +23,6 @@ public class ServerFacade {
         var path = "/session";
         return this.makeRequest("POST", path, newUser, null, AuthData.class);
     }
-//    public AuthData login(String username, String password) throws ResponseException{
-//        var path = "/session";
-//        UserData newUser = new UserData(username, password, null);
-//        return this.makeRequest("POST", path, newUser, null, AuthData.class);
-//    }
 
     public GameData logout(String authToken) throws ResponseException{
         var path = "/session";
