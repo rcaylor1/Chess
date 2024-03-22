@@ -44,7 +44,6 @@ public class ChessClient {
         String info = scanner.nextLine();
         if (state != State.LOGGED_IN){
             switch(info){
-                case "0" -> newBoard.printBoard();
                 case "1" -> {
                     System.out.println("1. Help: Displays text about what actions you can take");
                     System.out.println("2. Quit: Exits the program");

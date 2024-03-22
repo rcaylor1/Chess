@@ -19,11 +19,11 @@ public class GamePlay {
     public void printBoard(){
         newBoard.resetBoard();
         printBlackBoard();
-        System.out.println();
         printWhiteBoard();
     }
 
     public void printWhiteBoard(){
+        System.out.println();
         System.out.print("    ");
         for (int i=0; i<BOARD_SIZE; i++){
             System.out.print(SET_TEXT_COLOR_WHITE);
