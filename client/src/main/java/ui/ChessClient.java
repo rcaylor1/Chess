@@ -1,5 +1,6 @@
 package ui;
 
+import chess.ChessBoard;
 import chess.ChessGame;
 import model.AuthData;
 import model.GameData;
@@ -22,12 +23,12 @@ public class ChessClient {
         System.out.print(SET_BG_COLOR_DARK_GREY);
         System.out.print(SET_TEXT_COLOR_BLUE);
         facade = new ServerFacade("http://localhost:8080");
+        newBoard = new GamePlay();
         try {
             run();
         } catch (ResponseException e){
             throw new RuntimeException(e);
         }
-        newBoard = new GamePlay();
     }
 
     public void run() throws ResponseException{

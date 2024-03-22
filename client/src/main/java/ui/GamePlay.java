@@ -1,6 +1,9 @@
 package ui;
 
 import chess.*;
+
+import java.util.Arrays;
+
 import static ui.EscapeSequences.*;
 
 public class GamePlay {
@@ -10,7 +13,8 @@ public class GamePlay {
     private final String[] rows = {null, " 1 ", " 2 ", " 3 ", " 4 ", " 5 ", " 6", " 7 ", " 8", " 9 ", null};
     private final String[] reverseRows = {null, " 8 ", " 7 ", " 6 ", " 5 ", " 4 ", " 3 ", " 2 ", " 1 ", null};
 
-    private ChessBoard newBoard = new ChessBoard();
+  private final ChessBoard newBoard = new ChessBoard();
+
     public void printBoard(){
         newBoard.resetBoard();
         printWhiteBoard();
@@ -19,7 +23,7 @@ public class GamePlay {
     }
 
     public void printWhiteBoard(){
-        System.out.println(columns);
+        System.out.println(Arrays.toString(columns));
         for (int row=1; row <= BOARD_SIZE; row++){
             System.out.println(rows[row+1]);
             for (int col=1; col <= BOARD_SIZE; col++){
@@ -43,11 +47,11 @@ public class GamePlay {
                 }
             }
         }
-        System.out.println(columns);
+        System.out.println(Arrays.toString(columns));
     }
 
     public void printBlackBoard(){
-        System.out.println(reverseColumns);
+        System.out.println(Arrays.toString(reverseColumns));
         for (int row=1; row <= BOARD_SIZE; row++){
             System.out.println(reverseRows[row+1]);
             for (int col=1; col <= BOARD_SIZE; col++){
@@ -71,7 +75,7 @@ public class GamePlay {
                 }
             }
         }
-        System.out.println(reverseColumns);
+        System.out.println(Arrays.toString(reverseColumns));
     }
 
     public String convertPiece(ChessPiece newPiece){
