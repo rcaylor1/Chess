@@ -43,20 +43,27 @@ public class ChessClient {
         System.out.print("[" + state + "] >>> ");
         String info = scanner.nextLine();
         if (state != State.LOGGED_IN){
-            switch(info){
-                case "1" -> {
-                    System.out.println("1. Help: Displays text about what actions you can take");
-                    System.out.println("2. Quit: Exits the program");
-                    System.out.println("3. Login: Logs in registered user");
-                    System.out.println("4. Register: Enter registration information");
-                    System.out.println();
-                    run();
+            try {
+                switch(info){
+                    case "1" -> {
+                        System.out.println("1. Help: Displays text about what actions you can take");
+                        System.out.println("2. Quit: Exits the program");
+                        System.out.println("3. Login: Logs in registered user");
+                        System.out.println("4. Register: Enter registration information");
+                        System.out.println();
+                        run();
+                    }
+                    case "2" -> System.out.println("Saying goodbye is death by a thousand cuts");
+                    case "3" -> login();
+                    case "4" -> register();
+                    default -> run();
                 }
-                case "2" -> System.out.println("Saying goodbye is death by a thousand cuts");
-                case "3" -> login();
-                case "4" -> register();
-                default -> run();
             }
+            catch (ResponseException e){
+                System.out.print(e.getMessage());
+                run();
+            }
+
         }
     }
 
@@ -99,23 +106,29 @@ public class ChessClient {
         System.out.println();
         System.out.print("[" + state + "] >>> ");
         String info = scanner.nextLine();
-        switch(info){
-            case "1" -> {
-                System.out.println("1. Help: Displays text about what actions you can take");
-                System.out.println("2. Logout: Logs out user and returns to beginning");
-                System.out.println("3. Create game: Creates a new game");
-                System.out.println("4. List games: Lists all current games");
-                System.out.println("5. Join game: Allows user to join existing game");
-                System.out.println("6. Join as observer: Allows user to observe existing game");
-                System.out.println();
-                postLogin(authToken);
+        try{
+            switch(info){
+                case "1" -> {
+                    System.out.println("1. Help: Displays text about what actions you can take");
+                    System.out.println("2. Logout: Logs out user and returns to beginning");
+                    System.out.println("3. Create game: Creates a new game");
+                    System.out.println("4. List games: Lists all current games");
+                    System.out.println("5. Join game: Allows user to join existing game");
+                    System.out.println("6. Join as observer: Allows user to observe existing game");
+                    System.out.println();
+                    postLogin(authToken);
+                }
+                case "2" -> logout(authToken);
+                case "3" -> createGame(authToken);
+                case "4" -> listGames(authToken);
+                case "5" -> joinGame(authToken);
+                case "6" -> joinObserver(authToken);
+                default -> postLogin(authToken);
             }
-            case "2" -> logout(authToken);
-            case "3" -> createGame(authToken);
-            case "4" -> listGames(authToken);
-            case "5" -> joinGame(authToken);
-            case "6" -> joinObserver(authToken);
-            default -> postLogin(authToken);
+        }
+        catch (ResponseException e){
+            System.out.println(e.getMessage());
+            postLogin(authToken);
         }
     }
 
@@ -141,23 +154,26 @@ public class ChessClient {
             System.out.println("Name: " + newGame.gameName());
             System.out.println("\tPlayers: " + newGame.whiteUsername() + " and " + newGame.blackUsername());
         }
+        postLogin(authToken);
     }
 
     private void joinGame(String authToken) throws ResponseException{
-        listGames(authToken);
+//        listGames(authToken);
         System.out.print("Please enter the number of the desired game: ");
         int gameNumber = Integer.parseInt(scanner.nextLine());
         System.out.print("Please enter the color of the desired color in all caps: ");
         String playerColor = scanner.nextLine();
         facade.joinGame(new JoinGameRequest(playerColor, gameNumber), authToken);
         newBoard.printBoard();
+        postLogin(authToken);
     }
 
     private void joinObserver(String authToken) throws ResponseException{
-        listGames(authToken);
+//        listGames(authToken);
         System.out.print("Please enter the number of the desired game to watch: ");
         int gameNumber = Integer.parseInt(scanner.nextLine());
         facade.joinGame(new JoinGameRequest(null, gameNumber), authToken);
         newBoard.printBoard();
+        postLogin(authToken);
     }
 }
