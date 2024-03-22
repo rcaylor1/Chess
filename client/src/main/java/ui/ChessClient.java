@@ -158,7 +158,6 @@ public class ChessClient {
     }
 
     private void joinGame(String authToken) throws ResponseException{
-//        listGames(authToken);
         System.out.print("Please enter the number of the desired game: ");
         int gameNumber = Integer.parseInt(scanner.nextLine());
         System.out.print("Please enter the color of the desired color in all caps: ");
@@ -169,7 +168,6 @@ public class ChessClient {
     }
 
     private void joinObserver(String authToken) throws ResponseException{
-//        listGames(authToken);
         System.out.print("Please enter the number of the desired game to watch: ");
         int gameNumber = Integer.parseInt(scanner.nextLine());
         facade.joinGame(new JoinGameRequest(null, gameNumber), authToken);
