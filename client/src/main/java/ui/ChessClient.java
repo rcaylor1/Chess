@@ -15,6 +15,7 @@ public class ChessClient {
     private Scanner scanner = new Scanner(System.in);
     private State state = State.LOGGED_OUT;
     private ServerFacade facade;
+    private GamePlay newBoard;
 
 
     public ChessClient(){
@@ -26,6 +27,7 @@ public class ChessClient {
         } catch (ResponseException e){
             throw new RuntimeException(e);
         }
+        newBoard = new GamePlay();
     }
 
     public void run() throws ResponseException{
@@ -110,8 +112,8 @@ public class ChessClient {
             case "2" -> logout(authToken);
             case "3" -> createGame(authToken);
             case "4" -> listGames(authToken);
-            case "5" -> System.out.println("join game");
-            case "6" -> System.out.println("observe");
+            case "5" -> joinGame(authToken);
+            case "6" -> joinObserver(authToken);
             default -> postLogin(authToken);
         }
     }
@@ -138,5 +140,23 @@ public class ChessClient {
             System.out.println("Name: " + newGame.gameName());
             System.out.println("\tPlayers: " + newGame.whiteUsername() + " and " + newGame.blackUsername());
         }
+    }
+
+    private void joinGame(String authToken) throws ResponseException{
+        listGames(authToken);
+        System.out.print("Please enter the number of the desired game: ");
+        int gameNumber = Integer.parseInt(scanner.nextLine());
+        System.out.print("Please enter the color of the desired color in all caps: ");
+        String playerColor = scanner.nextLine();
+        facade.joinGame(new JoinGameRequest(playerColor, gameNumber), authToken);
+        newBoard.printBoard();
+    }
+
+    private void joinObserver(String authToken) throws ResponseException{
+        listGames(authToken);
+        System.out.print("Please enter the number of the desired game to watch: ");
+        int gameNumber = Integer.parseInt(scanner.nextLine());
+        facade.joinGame(new JoinGameRequest(null, gameNumber), authToken);
+        newBoard.printBoard();
     }
 }
