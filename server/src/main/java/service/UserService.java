@@ -35,9 +35,6 @@ public class UserService {
         if (newUser == null){
             throw new UnauthorizedException("Error: unauthorized");
         }
-//        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-//
-//        if (!encoder.matches(newUser.password(), loginRequest.password())) throw new DataAccessException("Error: incorrect password");
         if (!newUser.password().equals(loginRequest.password())){
             throw new DataAccessException("Error: unauthorized");
         }

@@ -7,7 +7,7 @@ import java.util.Arrays;
 import static ui.EscapeSequences.*;
 
 public class GamePlay {
-    private final int BOARD_SIZE = 8;
+    private static final int BOARD_SIZE = 8;
     private final String[] columns = {" a  ", " b  ", " c  ", "d  ", " e  ", " f ", "  g ", " h "};
     private final String[] reverseColumns = {" h  ", " g  ", " f  ", "e  ", " d  ", " c ", "  b ", " a "};
     private final String[] rows = {" 1 ", " 2 ", " 3 ", " 4 ", " 5 ", " 6 ", " 7 ", " 8 ", " 9 "};
