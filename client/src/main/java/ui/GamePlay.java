@@ -35,16 +35,15 @@ public class GamePlay implements GameHandler {
     public void printBoard(){
         try{
 //            newBoard.resetBoard();
-            if (teamColor == null) {
-                socket.joinObserver(authToken, gameID);
-            } else {
+            if (teamColor != null) {
                 socket.joinPlayer(authToken, gameID, teamColor);
+            } else {
+                socket.joinObserver(authToken, gameID);
             }
         }
         catch (IOException e){
             throw new RuntimeException(e);
         }
-        System.out.println("did you do it");
     }
 
     public void printWhiteBoard(){

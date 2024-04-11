@@ -14,9 +14,7 @@ import webSocketMessages.serverMessages.Notification;
 import webSocketMessages.serverMessages.ServerMessage;
 import webSocketMessages.userCommands.*;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @WebSocket
 public class WebSocketHandler {
@@ -38,11 +36,11 @@ public class WebSocketHandler {
     }
 
     @OnWebSocketMessage
-    public void onMessage(Session session, String message) throws IOException {
+    public void onMessage(Session session, String message) throws IOException, DataAccessException {
         UserGameCommand userGameCommand = new Gson().fromJson(message, UserGameCommand.class);
         switch (userGameCommand.getCommandType()) {
             case JOIN_PLAYER -> joinPlayer(session, message);
-            case JOIN_OBSERVER -> System.out.println("join observer not implemented");
+            case JOIN_OBSERVER -> joinObserver(session, message);
             case MAKE_MOVE -> System.out.println("make move not implemented");
             case LEAVE -> System.out.println("leave not implemented");
             case RESIGN -> System.out.println("resign not implemented");
@@ -53,6 +51,11 @@ public class WebSocketHandler {
         JoinPlayer command = new Gson().fromJson(message, JoinPlayer.class);
         try {
             GameData gameData = gameDAO.getGame(command.getGameID());
+
+//            if (gameData.gameID() != command.getGameID()){
+//                ErrorMessage error = new ErrorMessage("Error: Bad Game ID");
+//                session.getRemote().sendString(new Gson().toJson(error));
+//            }
 
             if (gameData == null) {
                 ErrorMessage error = new ErrorMessage("Error: Game does not exist");
@@ -70,7 +73,7 @@ public class WebSocketHandler {
                     session.getRemote().sendString(new Gson().toJson(error));
                 }
             } else if (command.getPlayerColor() == ChessGame.TeamColor.BLACK) {
-                if (!Objects.equals(gameData.blackUsername(), username)) {
+                if (!gameData.blackUsername().equals(username)) {
                     ErrorMessage error = new ErrorMessage("Error: Spot not available");
                     session.getRemote().sendString(new Gson().toJson(error));
                 }
@@ -83,6 +86,32 @@ public class WebSocketHandler {
             this.broadcastMessage(command.getGameID(), newNotification, authToken);
 
         } catch (DataAccessException e) {
+            session.getRemote().sendString(new Gson().toJson(new ErrorMessage("Error: " + e.getMessage())));
+        }
+    }
+
+    private void joinObserver(Session session, String message) throws IOException {
+        JoinObserver command = new Gson().fromJson(message, JoinObserver.class);
+        try {
+            GameData gameData = gameDAO.getGame(command.getGameID());
+            if (gameData == null) {
+                ErrorMessage error = new ErrorMessage("Error: No game with this ID");
+                session.getRemote().sendString(new Gson().toJson(error));
+                return;
+            }
+
+            String authToken = command.getAuthString();
+            AuthData authData = authDAO.getAuth(authToken);
+            String username = authData.username();
+
+            this.sessions.addSessionToGame(command.getGameID(), authToken, session);
+            LoadGame rootMessage = new LoadGame(gameData.game());
+            sendMessage(command.getGameID(), rootMessage, authToken);
+
+            Notification newNotification = new Notification(String.format(username + " joined as an observer"));
+            this.broadcastMessage(command.getGameID(), newNotification, authToken);
+        }
+        catch (DataAccessException e){
             session.getRemote().sendString(new Gson().toJson(new ErrorMessage("Error: " + e.getMessage())));
         }
     }
@@ -103,20 +132,8 @@ public class WebSocketHandler {
     }
 
     private void sendMessage(int gameID, ServerMessage serverMessage, String authToken) throws IOException {
-        HashMap<String, Session> game = sessions.getSessionsForGame(gameID);
+        Map<String, Session> game = sessions.getSessionsForGame(gameID);
         Session session = game.get(authToken);
         session.getRemote().sendString(new Gson().toJson(serverMessage));
-    }
-
-    @OnWebSocketConnect
-    public void onConnect(Session session) {}
-
-    @OnWebSocketClose
-    public void onClose(int statusCode, String reason) {
-    }
-
-    @OnWebSocketError
-    public void onError(Throwable cause) {
-        return;
     }
 }
