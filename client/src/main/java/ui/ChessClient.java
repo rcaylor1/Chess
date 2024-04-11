@@ -164,7 +164,6 @@ public class ChessClient {
         String playerColor = scanner.nextLine();
         facade.joinGame(new JoinGameRequest(playerColor, gameNumber), authToken);
         newBoard.printBoard();
-        postLogin(authToken);
     }
 
     private void joinObserver(String authToken) throws ResponseException{
@@ -172,6 +171,5 @@ public class ChessClient {
         int gameNumber = Integer.parseInt(scanner.nextLine());
         facade.joinGame(new JoinGameRequest(null, gameNumber), authToken);
         newBoard.printBoard();
-        postLogin(authToken);
     }
 }
