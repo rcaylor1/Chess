@@ -56,25 +56,25 @@ public class WebSocketHandler {
             AuthData authData = authDAO.getAuth(authToken);
 
             if (gameData == null) {
-                Error error = new Error(ServerMessage.ServerMessageType.ERROR, "Error: bad game ID");
+                Error error = new Error("Error: bad game ID");
                 session.getRemote().sendString(new Gson().toJson(error));
                 return;
             }
             if (authData == null){
-                Error error = new Error(ServerMessage.ServerMessageType.ERROR, "Error: authToken");
+                Error error = new Error("Error: authToken");
                 session.getRemote().sendString(new Gson().toJson(error));
                 return;
             }
 
             if (command.getPlayerColor() == ChessGame.TeamColor.WHITE) {
                 if (gameData.whiteUsername() == null || !gameData.whiteUsername().equals(authData.username())) {
-                    Error error = new Error(ServerMessage.ServerMessageType.ERROR,"Error: Spot not available");
+                    Error error = new Error("Error: Spot not available");
                     session.getRemote().sendString(new Gson().toJson(error));
                     return;
                 }
             } else if (command.getPlayerColor() == ChessGame.TeamColor.BLACK) {
                 if (gameData.blackUsername() == null || !gameData.blackUsername().equals(authData.username())) {
-                    Error error = new Error(ServerMessage.ServerMessageType.ERROR,"Error: Spot not available");
+                    Error error = new Error("Error: Spot not available");
                     session.getRemote().sendString(new Gson().toJson(error));
                     return;
                 }
@@ -87,7 +87,7 @@ public class WebSocketHandler {
             this.broadcastMessage(command.getGameID(), newNotification, authToken);
 
         } catch (DataAccessException | IOException e) {
-            session.getRemote().sendString(new Gson().toJson(new Error(ServerMessage.ServerMessageType.ERROR,"Error: " + e.getMessage())));
+            session.getRemote().sendString(new Gson().toJson(new Error("Error: " + e.getMessage())));
         }
     }
 
@@ -98,12 +98,12 @@ public class WebSocketHandler {
             String authToken = command.getAuthString();
             AuthData authData = authDAO.getAuth(authToken);
             if (gameData == null) {
-                Error error = new Error(ServerMessage.ServerMessageType.ERROR,"Error: No game with this ID");
+                Error error = new Error("Error: No game with this ID");
                 session.getRemote().sendString(new Gson().toJson(error));
                 return;
             }
             if (authData == null){
-                Error error = new Error(ServerMessage.ServerMessageType.ERROR, "Error: authToken");
+                Error error = new Error("Error: authToken");
                 session.getRemote().sendString(new Gson().toJson(error));
                 return;
             }
@@ -115,7 +115,7 @@ public class WebSocketHandler {
             this.broadcastMessage(command.getGameID(), newNotification, authToken);
         }
         catch (DataAccessException e){
-            session.getRemote().sendString(new Gson().toJson(new Error(ServerMessage.ServerMessageType.ERROR,"Error: " + e.getMessage())));
+            session.getRemote().sendString(new Gson().toJson(new Error("Error: " + e.getMessage())));
         }
     }
 
@@ -140,8 +140,8 @@ public class WebSocketHandler {
         session.getRemote().sendString(new Gson().toJson(serverMessage));
     }
 
-    @OnWebSocketError
-    public void onError(Throwable cause) {
-        return;
-    }
+//    @OnWebSocketError
+//    public void onError(Throwable cause) {
+//        return;
+//    }
 }
