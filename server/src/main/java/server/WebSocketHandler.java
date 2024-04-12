@@ -52,31 +52,28 @@ public class WebSocketHandler {
         JoinPlayer command = new Gson().fromJson(message, JoinPlayer.class);
         try {
             GameData gameData = gameDAO.getGame(command.getGameID());
-
-//            if (gameData.gameID() != command.getGameID()){
-//                ErrorMessage error = new ErrorMessage("Error: Bad Game ID");
-//                session.getRemote().sendString(new Gson().toJson(error));
-//            }
+            String authToken = command.getAuthString();
+            AuthData authData = authDAO.getAuth(authToken);
 
             if (gameData == null) {
                 Error error = new Error(ServerMessage.ServerMessageType.ERROR, "Error: bad game ID");
                 session.getRemote().sendString(new Gson().toJson(error));
                 return;
             }
-
-            String authToken = command.getAuthString();
-            AuthData authData = authDAO.getAuth(authToken);
-            String username = authData.username();
-
+            if (authData == null){
+                Error error = new Error(ServerMessage.ServerMessageType.ERROR, "Error: authToken");
+                session.getRemote().sendString(new Gson().toJson(error));
+                return;
+            }
 
             if (command.getPlayerColor() == ChessGame.TeamColor.WHITE) {
-                if (!gameData.whiteUsername().equals(username)) {
+                if (!gameData.whiteUsername().equals(authData.username())) {
                     Error error = new Error(ServerMessage.ServerMessageType.ERROR,"Error: Spot not available");
                     session.getRemote().sendString(new Gson().toJson(error));
                     return;
                 }
             } else if (command.getPlayerColor() == ChessGame.TeamColor.BLACK) {
-                if (!gameData.blackUsername().equals(username)) {
+                if (!gameData.blackUsername().equals(authData.username())) {
                     Error error = new Error(ServerMessage.ServerMessageType.ERROR,"Error: Spot not available");
                     session.getRemote().sendString(new Gson().toJson(error));
                     return;
@@ -87,7 +84,7 @@ public class WebSocketHandler {
             sessions.addSessionToGame(command.getGameID(), authToken, session);
             LoadGame loadGameMessage = new LoadGame(gameData.game());
             this.sendMessage(command.getGameID(), loadGameMessage, authToken);
-            Notification newNotification = new Notification(String.format(username + " joined as " + command.getPlayerColor()));
+            Notification newNotification = new Notification(String.format(authData.username() + " joined as " + command.getPlayerColor()));
             this.broadcastMessage(command.getGameID(), newNotification, authToken);
 
         } catch (DataAccessException | IOException e) {
@@ -99,21 +96,23 @@ public class WebSocketHandler {
         JoinObserver command = new Gson().fromJson(message, JoinObserver.class);
         try {
             GameData gameData = gameDAO.getGame(command.getGameID());
+            String authToken = command.getAuthString();
+            AuthData authData = authDAO.getAuth(authToken);
             if (gameData == null) {
                 Error error = new Error(ServerMessage.ServerMessageType.ERROR,"Error: No game with this ID");
                 session.getRemote().sendString(new Gson().toJson(error));
                 return;
             }
-
-            String authToken = command.getAuthString();
-            AuthData authData = authDAO.getAuth(authToken);
-            String username = authData.username();
+            if (authData == null){
+                Error error = new Error(ServerMessage.ServerMessageType.ERROR, "Error: authToken");
+                session.getRemote().sendString(new Gson().toJson(error));
+                return;
+            }
 
             this.sessions.addSessionToGame(command.getGameID(), authToken, session);
             LoadGame rootMessage = new LoadGame(gameData.game());
             sendMessage(command.getGameID(), rootMessage, authToken);
-
-            Notification newNotification = new Notification(String.format(username + " joined as an observer"));
+            Notification newNotification = new Notification(String.format(authData.username() + " joined as an observer"));
             this.broadcastMessage(command.getGameID(), newNotification, authToken);
         }
         catch (DataAccessException e){
