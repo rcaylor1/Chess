@@ -43,7 +43,7 @@ public class WebSocketHandler {
             case JOIN_PLAYER -> joinPlayer(session, message);
             case JOIN_OBSERVER -> joinObserver(session, message);
             case MAKE_MOVE -> System.out.println("make move not implemented");
-            case LEAVE -> System.out.println("leave not implemented");
+            case LEAVE -> leave(session, message);
             case RESIGN -> System.out.println("resign not implemented");
         }
     }
@@ -119,6 +119,37 @@ public class WebSocketHandler {
         }
     }
 
+    public void leave(Session session, String message) throws IOException {
+        JoinPlayer command = new Gson().fromJson(message, JoinPlayer.class);
+        try {
+            GameData gameData = gameDAO.getGame(command.getGameID());
+            String authToken = command.getAuthString();
+            AuthData authData = authDAO.getAuth(authToken);
+            if (gameData == null) {
+                Error error = new Error("Error: No game with this ID");
+                session.getRemote().sendString(new Gson().toJson(error));
+                return;
+            }
+            if (authData == null){
+                Error error = new Error("Error: authToken");
+                session.getRemote().sendString(new Gson().toJson(error));
+                return;
+            }
+            if (command.getPlayerColor() == ChessGame.TeamColor.WHITE){
+                gameDAO.updateGame(new GameData(command.getGameID(), null, gameData.blackUsername(), gameData.gameName(), gameData.game()));
+            } else if (command.getPlayerColor() == ChessGame.TeamColor.BLACK){
+                gameDAO.updateGame(new GameData(command.getGameID(), gameData.whiteUsername(), null, gameData.gameName(), gameData.game()));
+            }
+
+            Notification newNotification = new Notification(String.format(authData.username() + " left the game "));
+            this.broadcastMessage(command.getGameID(), newNotification, authToken);
+            this.sessions.removeSessionFromGame(command.getGameID(), authToken);
+        }
+        catch (DataAccessException e){
+            session.getRemote().sendString(new Gson().toJson(new Error("Error: " + e.getMessage())));
+        }
+    }
+
     public void broadcastMessage(int gameID, ServerMessage message, String exceptThisAuthToken) throws IOException{
         Map<String, Session> sessionsList = sessions.getSessionsForGame(gameID);
         if (sessionsList != null) {
@@ -134,14 +165,10 @@ public class WebSocketHandler {
         }
     }
 
+
     private void sendMessage(int gameID, ServerMessage serverMessage, String authToken) throws IOException {
         Map<String, Session> game = sessions.getSessionsForGame(gameID);
         Session session = game.get(authToken);
         session.getRemote().sendString(new Gson().toJson(serverMessage));
     }
-
-//    @OnWebSocketError
-//    public void onError(Throwable cause) {
-//        return;
-//    }
 }
