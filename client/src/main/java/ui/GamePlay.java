@@ -78,17 +78,7 @@ public class GamePlay implements GameHandler {
         return pieceType;
     }
 
-    private void setWhite(ChessPiece piece) {
-        System.out.print(SET_BG_COLOR_LIGHT_PURPLE);
-        System.out.print(pieceColor);
-        System.out.print(convertPiece(piece));
-    }
 
-    private void setBlack(ChessPiece piece) {
-        System.out.print(SET_BG_COLOR_LIGHT_BLUE);
-        System.out.print(pieceColor);
-        System.out.print(convertPiece(piece));
-    }
 
     @Override
     public void updateGame(ChessGame game) {
