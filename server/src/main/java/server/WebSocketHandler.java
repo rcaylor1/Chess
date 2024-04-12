@@ -158,28 +158,31 @@ public class WebSocketHandler {
         Resign command = new Gson().fromJson(message, Resign.class);
         try {
             GameData gameData = gameDAO.getGame(command.getGameID());
+            ChessGame game = gameData.game();
+
             String authToken = command.getAuthString();
             AuthData authData = authDAO.getAuth(authToken);
-            ChessGame game = gameData.game();
+
 
             if ((gameData.whiteUsername() == null || !gameData.whiteUsername().equals(authData.username()))){
                 if ((gameData.blackUsername() == null || !gameData.blackUsername().equals(authData.username()))) {
-                    Error error = new Error("Error: authToken");
+                    Error error = new Error("Error: Observers cannot resign");
                     session.getRemote().sendString(new Gson().toJson(error));
                     return;
                 }
             }
 
-            if (game.getTeamTurn() == null) {
-                Error error = new Error("Error: Cannot resign");
-                sendMessage(command.getGameID(), error, authToken);
-                return;
-            }
-            game.setTeamTurn(null);
+            if (game.getTeamTurn() == ChessGame.TeamColor.GAME_DONE){
+                Error error = new Error("Error: cannot resign");
+                session.getRemote().sendString(new Gson().toJson(error));
+                return;            }
+
+            game.setTeamTurn(ChessGame.TeamColor.GAME_DONE);
             gameDAO.updateGame(new GameData(command.getGameID(), gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game));
             Notification newNotification = new Notification(String.format(authData.username() + " resigned"));
             sendMessage(command.getGameID(), newNotification, authToken);
             broadcastMessage(command.getGameID(), newNotification, authToken);
+
         }
         catch (DataAccessException e){
             Error error = new Error("Error: " + e.getMessage());
@@ -209,3 +212,4 @@ public class WebSocketHandler {
         session.getRemote().sendString(new Gson().toJson(serverMessage));
     }
 }
+
