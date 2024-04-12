@@ -5,12 +5,13 @@ import com.google.gson.Gson;
 import dataAccess.*;
 import dataAccess.Exceptions.DataAccessException;
 import model.AuthData;
-import model.ErrorMessage;
+
 import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.*;
 import webSocketMessages.serverMessages.LoadGame;
 import webSocketMessages.serverMessages.Notification;
+import webSocketMessages.serverMessages.Error;
 import webSocketMessages.serverMessages.ServerMessage;
 import webSocketMessages.userCommands.*;
 import java.io.IOException;
@@ -58,8 +59,9 @@ public class WebSocketHandler {
 //            }
 
             if (gameData == null) {
-                ErrorMessage error = new ErrorMessage("Error: Game does not exist");
+                Error error = new Error(ServerMessage.ServerMessageType.ERROR, "Error: bad game ID");
                 session.getRemote().sendString(new Gson().toJson(error));
+                return;
             }
 
             String authToken = command.getAuthString();
@@ -69,14 +71,17 @@ public class WebSocketHandler {
 
             if (command.getPlayerColor() == ChessGame.TeamColor.WHITE) {
                 if (!gameData.whiteUsername().equals(username)) {
-                    ErrorMessage error = new ErrorMessage("Error: Spot not available");
+                    Error error = new Error(ServerMessage.ServerMessageType.ERROR,"Error: Spot not available");
                     session.getRemote().sendString(new Gson().toJson(error));
+                    return;
                 }
             } else if (command.getPlayerColor() == ChessGame.TeamColor.BLACK) {
                 if (!gameData.blackUsername().equals(username)) {
-                    ErrorMessage error = new ErrorMessage("Error: Spot not available");
+                    Error error = new Error(ServerMessage.ServerMessageType.ERROR,"Error: Spot not available");
                     session.getRemote().sendString(new Gson().toJson(error));
+                    return;
                 }
+
             }
 
             sessions.addSessionToGame(command.getGameID(), authToken, session);
@@ -85,8 +90,8 @@ public class WebSocketHandler {
             Notification newNotification = new Notification(String.format(username + " joined as " + command.getPlayerColor()));
             this.broadcastMessage(command.getGameID(), newNotification, authToken);
 
-        } catch (DataAccessException e) {
-            session.getRemote().sendString(new Gson().toJson(new ErrorMessage("Error: " + e.getMessage())));
+        } catch (DataAccessException | IOException e) {
+            session.getRemote().sendString(new Gson().toJson(new Error(ServerMessage.ServerMessageType.ERROR,"Error: " + e.getMessage())));
         }
     }
 
@@ -95,7 +100,7 @@ public class WebSocketHandler {
         try {
             GameData gameData = gameDAO.getGame(command.getGameID());
             if (gameData == null) {
-                ErrorMessage error = new ErrorMessage("Error: No game with this ID");
+                Error error = new Error(ServerMessage.ServerMessageType.ERROR,"Error: No game with this ID");
                 session.getRemote().sendString(new Gson().toJson(error));
                 return;
             }
@@ -112,7 +117,7 @@ public class WebSocketHandler {
             this.broadcastMessage(command.getGameID(), newNotification, authToken);
         }
         catch (DataAccessException e){
-            session.getRemote().sendString(new Gson().toJson(new ErrorMessage("Error: " + e.getMessage())));
+            session.getRemote().sendString(new Gson().toJson(new Error(ServerMessage.ServerMessageType.ERROR,"Error: " + e.getMessage())));
         }
     }
 
@@ -135,5 +140,10 @@ public class WebSocketHandler {
         Map<String, Session> game = sessions.getSessionsForGame(gameID);
         Session session = game.get(authToken);
         session.getRemote().sendString(new Gson().toJson(serverMessage));
+    }
+
+    @OnWebSocketError
+    public void onError(Throwable cause) {
+        return;
     }
 }
