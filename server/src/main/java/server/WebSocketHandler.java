@@ -44,7 +44,7 @@ public class WebSocketHandler {
             case JOIN_OBSERVER -> joinObserver(session, message);
             case MAKE_MOVE -> System.out.println("make move not implemented");
             case LEAVE -> leave(session, message);
-            case RESIGN -> System.out.println("resign not implemented");
+            case RESIGN -> resign(session, message);
         }
     }
 
@@ -82,12 +82,13 @@ public class WebSocketHandler {
 
             sessions.addSessionToGame(command.getGameID(), authToken, session);
             LoadGame loadGameMessage = new LoadGame(gameData.game());
-            this.sendMessage(command.getGameID(), loadGameMessage, authToken);
+            sendMessage(command.getGameID(), loadGameMessage, authToken);
             Notification newNotification = new Notification(String.format(authData.username() + " joined as " + command.getPlayerColor()));
-            this.broadcastMessage(command.getGameID(), newNotification, authToken);
+            broadcastMessage(command.getGameID(), newNotification, authToken);
 
         } catch (DataAccessException | IOException e) {
-            session.getRemote().sendString(new Gson().toJson(new Error("Error: " + e.getMessage())));
+            Error error = new Error("Error: " + e.getMessage());
+            session.getRemote().sendString(new Gson().toJson(error));
         }
     }
 
@@ -112,10 +113,11 @@ public class WebSocketHandler {
             LoadGame rootMessage = new LoadGame(gameData.game());
             sendMessage(command.getGameID(), rootMessage, authToken);
             Notification newNotification = new Notification(String.format(authData.username() + " joined as an observer"));
-            this.broadcastMessage(command.getGameID(), newNotification, authToken);
+            broadcastMessage(command.getGameID(), newNotification, authToken);
         }
         catch (DataAccessException e){
-            session.getRemote().sendString(new Gson().toJson(new Error("Error: " + e.getMessage())));
+            Error error = new Error("Error: " + e.getMessage());
+            session.getRemote().sendString(new Gson().toJson(error));
         }
     }
 
@@ -135,6 +137,7 @@ public class WebSocketHandler {
                 session.getRemote().sendString(new Gson().toJson(error));
                 return;
             }
+//            ChessGame.TeamColor teamColor = this.getTeamColor(gameID, userName);
             if (command.getPlayerColor() == ChessGame.TeamColor.WHITE){
                 gameDAO.updateGame(new GameData(command.getGameID(), null, gameData.blackUsername(), gameData.gameName(), gameData.game()));
             } else if (command.getPlayerColor() == ChessGame.TeamColor.BLACK){
@@ -142,11 +145,45 @@ public class WebSocketHandler {
             }
 
             Notification newNotification = new Notification(String.format(authData.username() + " left the game "));
-            this.broadcastMessage(command.getGameID(), newNotification, authToken);
-            this.sessions.removeSessionFromGame(command.getGameID(), authToken);
+            broadcastMessage(command.getGameID(), newNotification, authToken);
+            sessions.removeSessionFromGame(command.getGameID(), authToken);
         }
         catch (DataAccessException e){
-            session.getRemote().sendString(new Gson().toJson(new Error("Error: " + e.getMessage())));
+            Error error = new Error("Error: " + e.getMessage());
+            session.getRemote().sendString(new Gson().toJson(error));
+        }
+    }
+
+    public void resign(Session session, String message) throws IOException {
+        Resign command = new Gson().fromJson(message, Resign.class);
+        try {
+            GameData gameData = gameDAO.getGame(command.getGameID());
+            String authToken = command.getAuthString();
+            AuthData authData = authDAO.getAuth(authToken);
+            ChessGame game = gameData.game();
+
+            if ((gameData.whiteUsername() == null || !gameData.whiteUsername().equals(authData.username()))){
+                if ((gameData.blackUsername() == null || !gameData.blackUsername().equals(authData.username()))) {
+                    Error error = new Error("Error: authToken");
+                    session.getRemote().sendString(new Gson().toJson(error));
+                    return;
+                }
+            }
+
+            if (game.getTeamTurn() == null) {
+                Error error = new Error("Error: Cannot resign");
+                sendMessage(command.getGameID(), error, authToken);
+                return;
+            }
+            game.setTeamTurn(null);
+            gameDAO.updateGame(new GameData(command.getGameID(), gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game));
+            Notification newNotification = new Notification(String.format(authData.username() + " resigned"));
+            sendMessage(command.getGameID(), newNotification, authToken);
+            broadcastMessage(command.getGameID(), newNotification, authToken);
+        }
+        catch (DataAccessException e){
+            Error error = new Error("Error: " + e.getMessage());
+            session.getRemote().sendString(new Gson().toJson(error));
         }
     }
 
