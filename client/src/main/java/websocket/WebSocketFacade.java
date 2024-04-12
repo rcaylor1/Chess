@@ -70,15 +70,4 @@ public class WebSocketFacade extends Endpoint{
         this.sendMessage(new JoinObserver(authToken, gameID));
     }
 
-    public void makeMove(String authToken, int gameID, ChessMove move) throws IOException {
-        this.sendMessage(new MakeMove(authToken, gameID, move));
-    }
-
-    public void leaveGame(String authToken, int gameID) throws IOException {
-        this.sendMessage(new Leave(authToken, gameID));
-    }
-
-    public void resignGame(String authToken, int gameID) throws IOException {
-        this.sendMessage(new Resign(authToken, gameID));
-    }
 }
