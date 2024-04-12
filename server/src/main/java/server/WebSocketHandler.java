@@ -1,6 +1,9 @@
 package server;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPosition;
+import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import dataAccess.*;
 import dataAccess.Exceptions.DataAccessException;
@@ -42,7 +45,7 @@ public class WebSocketHandler {
         switch (userGameCommand.getCommandType()) {
             case JOIN_PLAYER -> joinPlayer(session, message);
             case JOIN_OBSERVER -> joinObserver(session, message);
-            case MAKE_MOVE -> System.out.println("make move not implemented");
+            case MAKE_MOVE -> makeMove(session, message);
             case LEAVE -> leave(session, message);
             case RESIGN -> resign(session, message);
         }
@@ -122,7 +125,7 @@ public class WebSocketHandler {
     }
 
     public void leave(Session session, String message) throws IOException {
-        JoinPlayer command = new Gson().fromJson(message, JoinPlayer.class);
+        Leave command = new Gson().fromJson(message, Leave.class);
         try {
             GameData gameData = gameDAO.getGame(command.getGameID());
             String authToken = command.getAuthString();
@@ -137,10 +140,10 @@ public class WebSocketHandler {
                 session.getRemote().sendString(new Gson().toJson(error));
                 return;
             }
-//            ChessGame.TeamColor teamColor = this.getTeamColor(gameID, userName);
-            if (command.getPlayerColor() == ChessGame.TeamColor.WHITE){
+            ChessGame game = gameData.game();
+            if (game.getTeamTurn() == ChessGame.TeamColor.WHITE){
                 gameDAO.updateGame(new GameData(command.getGameID(), null, gameData.blackUsername(), gameData.gameName(), gameData.game()));
-            } else if (command.getPlayerColor() == ChessGame.TeamColor.BLACK){
+            } else if (game.getTeamTurn() == ChessGame.TeamColor.BLACK){
                 gameDAO.updateGame(new GameData(command.getGameID(), gameData.whiteUsername(), null, gameData.gameName(), gameData.game()));
             }
 
@@ -190,6 +193,30 @@ public class WebSocketHandler {
         }
     }
 
+    public void makeMove(Session session, String message) throws IOException {
+        MakeMove command = new Gson().fromJson(message, MakeMove.class);
+        try {
+            GameData gameData = gameDAO.getGame(command.getGameID());
+            ChessGame game = gameData.game();
+            String authToken = command.getAuthString();
+            AuthData authData = authDAO.getAuth(authToken);
+            ChessMove move = command.getMove();
+
+            game.makeMove(move);
+            gameDAO.updateGame(new GameData(command.getGameID(), gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game));
+
+            LoadGame loadGameMessage = new LoadGame(game);
+            Notification notification = new Notification(authData.username() + " moved to " + command.getMove().getEndPosition());
+            sendMessage(command.getGameID(), loadGameMessage, authToken);
+            broadcastMessage(command.getGameID(), loadGameMessage, authToken);
+            broadcastMessage(command.getGameID(), notification, authToken);
+        }
+        catch (DataAccessException | InvalidMoveException e){
+            Error error = new Error("Error: " + e.getMessage());
+            session.getRemote().sendString(new Gson().toJson(error));
+        }
+    }
+
     public void broadcastMessage(int gameID, ServerMessage message, String exceptThisAuthToken) throws IOException{
         Map<String, Session> sessionsList = sessions.getSessionsForGame(gameID);
         if (sessionsList != null) {
@@ -211,5 +238,6 @@ public class WebSocketHandler {
         Session session = game.get(authToken);
         session.getRemote().sendString(new Gson().toJson(serverMessage));
     }
+
 }
 
