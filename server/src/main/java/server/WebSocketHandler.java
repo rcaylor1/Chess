@@ -1,9 +1,6 @@
 package server;
 
-import chess.ChessGame;
-import chess.ChessMove;
-import chess.ChessPosition;
-import chess.InvalidMoveException;
+import chess.*;
 import com.google.gson.Gson;
 import dataAccess.*;
 import dataAccess.Exceptions.DataAccessException;
@@ -136,7 +133,7 @@ public class WebSocketHandler {
                 return;
             }
             if (authData == null){
-                Error error = new Error("Error: authToken");
+                Error error = new Error("Error: invalid authToken");
                 session.getRemote().sendString(new Gson().toJson(error));
                 return;
             }
@@ -178,7 +175,8 @@ public class WebSocketHandler {
             if (game.getTeamTurn() == ChessGame.TeamColor.GAME_DONE){
                 Error error = new Error("Error: cannot resign");
                 session.getRemote().sendString(new Gson().toJson(error));
-                return;            }
+                return;
+            }
 
             game.setTeamTurn(ChessGame.TeamColor.GAME_DONE);
             gameDAO.updateGame(new GameData(command.getGameID(), gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game));
@@ -197,10 +195,39 @@ public class WebSocketHandler {
         MakeMove command = new Gson().fromJson(message, MakeMove.class);
         try {
             GameData gameData = gameDAO.getGame(command.getGameID());
-            ChessGame game = gameData.game();
             String authToken = command.getAuthString();
             AuthData authData = authDAO.getAuth(authToken);
             ChessMove move = command.getMove();
+            ChessGame.TeamColor teamColor = null;
+
+            if (gameData == null) {
+                Error error = new Error("Error: No game with this ID");
+                session.getRemote().sendString(new Gson().toJson(error));
+                return;
+            }
+            if (authData == null){
+                Error error = new Error("Error: invalid authToken");
+                session.getRemote().sendString(new Gson().toJson(error));
+                return;
+            }
+
+            ChessGame game = gameData.game();
+            ChessPiece piece = game.getBoard().getPiece(move.getStartPosition());
+            if (gameData.whiteUsername().equals(authData.username())) {
+                teamColor = ChessGame.TeamColor.WHITE;
+            } else if (gameData.blackUsername().equals(authData.username())) {
+                teamColor = ChessGame.TeamColor.BLACK;
+            }
+            if (game.getTeamTurn() == ChessGame.TeamColor.GAME_DONE){
+                Error error = new Error("Error: Game is over. No more moves can be made");
+                session.getRemote().sendString(new Gson().toJson(error));
+                return;
+            }
+            if (piece.getTeamColor() != teamColor){
+                Error error = new Error("Error: Not your team's piece");
+                session.getRemote().sendString(new Gson().toJson(error));
+                return;
+            }
 
             game.makeMove(move);
             gameDAO.updateGame(new GameData(command.getGameID(), gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game));
