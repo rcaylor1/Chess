@@ -48,35 +48,6 @@ public class GamePlay implements GameHandler {
 
 
 
-    public String convertPiece(ChessPiece newPiece){
-        if (newPiece == null){
-            return " \u2003 ";
-        }
-        ChessPiece.PieceType piece = newPiece.getPieceType();
-        if (newPiece.getTeamColor() == ChessGame.TeamColor.WHITE){
-            switch(piece){
-                case PAWN -> pieceType = EscapeSequences.WHITE_PAWN;
-                case BISHOP -> pieceType = EscapeSequences.WHITE_BISHOP;
-                case ROOK -> pieceType = EscapeSequences.WHITE_ROOK;
-                case KING -> pieceType = EscapeSequences.WHITE_KING;
-                case KNIGHT -> pieceType = EscapeSequences.WHITE_KNIGHT;
-                case QUEEN -> pieceType = EscapeSequences.WHITE_QUEEN;
-                default -> pieceType = " \u2003 ";
-            }
-        }
-        else if (newPiece.getTeamColor() == ChessGame.TeamColor.BLACK){
-            switch(piece){
-                case PAWN -> pieceType = EscapeSequences.BLACK_PAWN;
-                case BISHOP -> pieceType = EscapeSequences.BLACK_BISHOP;
-                case ROOK -> pieceType = EscapeSequences.BLACK_ROOK;
-                case KING -> pieceType = EscapeSequences.BLACK_KING;
-                case KNIGHT -> pieceType = EscapeSequences.BLACK_KNIGHT;
-                case QUEEN -> pieceType = EscapeSequences.BLACK_QUEEN;
-                default -> pieceType = " \u2003 ";
-            }
-        }
-        return pieceType;
-    }
 
 
 
