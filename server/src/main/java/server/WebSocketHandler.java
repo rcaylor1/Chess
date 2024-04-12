@@ -67,18 +67,17 @@ public class WebSocketHandler {
             }
 
             if (command.getPlayerColor() == ChessGame.TeamColor.WHITE) {
-                if (!gameData.whiteUsername().equals(authData.username())) {
+                if (gameData.whiteUsername() == null || !gameData.whiteUsername().equals(authData.username())) {
                     Error error = new Error(ServerMessage.ServerMessageType.ERROR,"Error: Spot not available");
                     session.getRemote().sendString(new Gson().toJson(error));
                     return;
                 }
             } else if (command.getPlayerColor() == ChessGame.TeamColor.BLACK) {
-                if (!gameData.blackUsername().equals(authData.username())) {
+                if (gameData.blackUsername() == null || !gameData.blackUsername().equals(authData.username())) {
                     Error error = new Error(ServerMessage.ServerMessageType.ERROR,"Error: Spot not available");
                     session.getRemote().sendString(new Gson().toJson(error));
                     return;
                 }
-
             }
 
             sessions.addSessionToGame(command.getGameID(), authToken, session);
