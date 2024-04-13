@@ -224,7 +224,7 @@ public class WebSocketHandler {
                 return;
             }
             if (piece.getTeamColor() != teamColor){
-                Error error = new Error("Error: Not your team's piece");
+                Error error = new Error("Error: Cannot move piece");
                 session.getRemote().sendString(new Gson().toJson(error));
                 return;
             }
@@ -237,6 +237,26 @@ public class WebSocketHandler {
             sendMessage(command.getGameID(), loadGameMessage, authToken);
             broadcastMessage(command.getGameID(), loadGameMessage, authToken);
             broadcastMessage(command.getGameID(), notification, authToken);
+
+            if (game.isInCheck(teamColor)){
+                Notification checkNotification = new Notification("Check");
+                sendMessage(command.getGameID(), checkNotification, authToken);
+                broadcastMessage(command.getGameID(), checkNotification, authToken);
+            } else if (game.isInCheckmate(teamColor)){
+                if (teamColor == ChessGame.TeamColor.WHITE){
+                    Notification checkmateNotification = new Notification("Checkmate! Black team won");
+                    sendMessage(command.getGameID(), checkmateNotification, authToken);
+                    broadcastMessage(command.getGameID(), checkmateNotification, authToken);
+                } else if (teamColor == ChessGame.TeamColor.BLACK){
+                    Notification checkmateNotification = new Notification("Checkmate! White team won");
+                    sendMessage(command.getGameID(), checkmateNotification, authToken);
+                    broadcastMessage(command.getGameID(), checkmateNotification, authToken);
+                }
+            } else if (game.isInStalemate(teamColor)){
+                Notification stalemateNotification = new Notification("Stalemate! It's a draw");
+                sendMessage(command.getGameID(), stalemateNotification, authToken);
+                broadcastMessage(command.getGameID(), stalemateNotification, authToken);
+            }
         }
         catch (DataAccessException | InvalidMoveException e){
             Error error = new Error("Error: " + e.getMessage());
