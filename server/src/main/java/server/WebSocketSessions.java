@@ -24,11 +24,7 @@ public class WebSocketSessions {
         }
     }
 
-    public void removeSession(Session session){
-        for (HashMap<String, Session> newSession : sessions.values()) {
-            newSession.values().removeIf(value -> value.equals(session));
-        }
-    }
+
 
     public HashMap<String, Session> getSessionsForGame(int gameID) {
         return sessions.get(gameID);
